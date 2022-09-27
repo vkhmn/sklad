@@ -1,0 +1,14 @@
+{% extends 'sklad/base.html' %}
+
+{% block content %}
+<p>{{post.name}}</p>
+<p>{{post.article}}</p>
+<p>{{post.amount}}</p>
+<p>{{post.price}}</p>
+
+{% if post.photo %}
+<p><img class="img-article-left" src="{{post.photo.url}}"></p>
+{% endif %}
+
+{{post.l|linebreaks}}
+{% endblock %}
