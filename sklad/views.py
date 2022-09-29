@@ -1,4 +1,4 @@
-from django.views.generic import ListView, DetailView, CreateView, TemplateView
+from django.views.generic import ListView, DetailView, CreateView
 from django.urls import reverse_lazy
 
 from sklad.models import *
@@ -82,11 +82,11 @@ class NomenclatureView(DataMixin, DetailView):
         return Nomenclature.objects.filter(pk=self.kwargs['pk'])
 
 
-class AddNomenklatureView(DataMixin, CreateView):
+class NomenklatureAddView(DataMixin, CreateView):
     """"Веб сервис для добавления номенклатуры. """
 
     form_class = AddNomenklatureForm
-    template_name = 'sklad/add_nomenclature.html'
+    template_name = 'sklad/nomenclature_add.html'
     success_url = reverse_lazy('nomenclature_list')
 #    login_url = reverse_lazy('home')
     raise_exception = True
