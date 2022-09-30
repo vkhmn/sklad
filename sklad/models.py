@@ -95,17 +95,26 @@ class Delivery(models.Model):
         Vendor,
         on_delete=models.CASCADE
     )
-    content = models.ManyToManyField(Nomenclature)
+    content = models.ManyToManyField(
+        Nomenclature,
+        through='DeliveryContent'
+    )
     status = models.CharField(
         max_length=2,
         choices=Status.choices,
         default=Status.VALIDATING
     )
-    date = models.DateTimeField()
+    date = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         verbose_name = 'Поставка'
         verbose_name_plural = 'Поставки'
+
+
+class DeliveryContent(models.Model):
+    nomenclature = models.ForeignKey(Nomenclature, on_delete=models.CASCADE)
+    delivery = models.ForeignKey(Delivery, on_delete=models.CASCADE)
+    amount = models.IntegerField()
 
 
 class Shipment(models.Model):
@@ -115,15 +124,27 @@ class Shipment(models.Model):
         Buyer,
         on_delete=models.CASCADE
     )
-    content = models.ManyToManyField(Nomenclature)
+    content = models.ManyToManyField(
+        Nomenclature,
+        through="ShipmentContent"
+    )
     status = models.CharField(
         max_length=2,
         choices=Status.choices,
         default=Status.VALIDATING
     )
-    date = models.DateTimeField()
+    date = models.DateTimeField(auto_now_add=True)
     qr = models.CharField(max_length=100)
+
+    def get_absolute_url(self):
+        return reverse('shipment', kwargs={'pk': self.pk})
 
     class Meta:
         verbose_name = 'Отгрузка'
         verbose_name_plural = 'Отгрузки'
+
+
+class ShipmentContent(models.Model):
+    nomenclature = models.ForeignKey(Nomenclature, on_delete=models.CASCADE)
+    shipment = models.ForeignKey(Shipment, on_delete=models.CASCADE)
+    amount = models.IntegerField(default=1)

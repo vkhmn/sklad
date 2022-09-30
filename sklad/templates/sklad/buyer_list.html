@@ -1,0 +1,23 @@
+{% extends 'sklad/base.html' %}
+
+{% block left_menu %}
+    	<ul id="leftchapters">
+        <li><a href="{% url 'buyer_add' %}">Добавить покупателя</a></li>
+		<li class="share">
+		</li>
+	</ul>
+
+{% endblock %}
+
+{% block content %}
+<ul class="list-articles">
+	{% for n in buyers %}
+			<li>
+                <p><a href="{{ n.get_absolute_url }}">{{ n.fio }}</a>
+                    ({{ n.article }})
+                </p>
+			<div class="clear"></div>
+			</li>
+	{% endfor %}
+</ul>
+{% endblock %}
