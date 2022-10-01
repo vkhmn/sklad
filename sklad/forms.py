@@ -22,11 +22,11 @@ class VendorAddForm(forms.ModelForm):
 
 class DeliveryAddForm(forms.ModelForm):
     class Meta:
-        model = Delivery
+        model = Document
         fields = '__all__'
 
 
 class ShipmentAddForm(forms.ModelForm):
     class Meta:
-        model = Shipment
+        model = Document
         fields = '__all__'

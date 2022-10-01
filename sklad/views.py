@@ -10,7 +10,7 @@ class IndexView(DataMixin, ListView):
     """"Веб сервис отображающий главную страницу, с последними заявками на
     отгрузку (поставку) товара."""
 
-    model = Delivery
+    model = Document
     template_name = 'sklad/index.html'
 
     def get_context_data(self, *, object_list=None, **kwargs):
@@ -41,7 +41,7 @@ class NomenclatureListView(DataMixin, ListView):
 class DeliveryListView(DataMixin, ListView):
     """"Веб сервис для работы с заявками на поставку."""
 
-    model = Delivery
+    model = Document
     template_name = 'sklad/delivery_list.html'
     context_object_name = 'deliveryes'
 
@@ -52,13 +52,13 @@ class DeliveryListView(DataMixin, ListView):
         return context
 
     def get_queryset(self):
-        return Delivery.objects.all()
+        return Document.objects.all()
 
 
 class ShipmentListView(DataMixin, ListView):
     """"Веб сервис для работы с заявками."""
 
-    model = Shipment
+    model = Document
     template_name = 'sklad/shipment_list.html'
     context_object_name = 'shipments'
 
@@ -69,7 +69,7 @@ class ShipmentListView(DataMixin, ListView):
         return context
 
     def get_queryset(self):
-        return Shipment.objects.all()
+        return Document.objects.all()
 
 
 class BuyerListView(DataMixin, ListView):
@@ -213,7 +213,7 @@ class ShipmentAddView(DataMixin, CreateView):
 class ShipmentView(DataMixin, DetailView):
     """"Веб сервис для работы с заявкой на отгрузку (отображение карточки)"""
 
-    model = Shipment
+    model = Document
     template_name = 'sklad/shipment.html'
     context_object_name = 'shipment'
 
