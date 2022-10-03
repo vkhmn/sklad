@@ -273,12 +273,6 @@ class DeliveryAddView(DataMixin, CreateView):
         return dict(list(context.items()) + list(c_def.items()))
 
 
-class RegisterView(ListView):
-    model = Nomenclature
-    template_name = 'sklad/register.html'
-
-
 class LoginView(ListView):
     model = Nomenclature
     template_name = 'sklad/login.html'
-
