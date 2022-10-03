@@ -12,7 +12,12 @@
 {% for n in shipments %}
 <li>
     <div class="article-panel">
-        <p class="first"><a href="{{ n.get_absolute_url }}">Заявка № {{ n.number }}</a> ({{ n.buyer }})</p>
+        {% if n.buyer %}
+            <p class="first">Отгрузка <a href="{{ n.get_absolute_url }}">Заявка № {{ n.pk }}</a> ({{ n.buyer }}) Статус: {{ n.get_status_display }}</p>
+        {% endif %}
+         {% if n.vendor %}
+            <p class="first">Поставка <a href="{{ n.get_absolute_url }}">Заявка № {{ n.pk }}</a> ({{ n.vendor }}) Статус: {{ n.get_status_display }}</p>
+        {% endif %}
 	    <p class="last">{{n.date|date:"d-m-Y H:i:s"}}</p>
     </div>
     <div class="clear"></div>

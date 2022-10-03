@@ -1,0 +1,32 @@
+{% extends 'sklad/base.html' %}
+
+{% block left_menu %}
+    {% include 'sklad/left_menu.html' %}
+{% endblock %}
+
+{% block content %}
+<h1>{{ title }}</h1>
+<ul class="list-articles">
+    {% if buyers %}
+	{% for n in buyers %}
+        <li>
+            <div class="article-panel">
+                <p class="first"><a href="{{ n.get_absolute_url }}">{{ n.fio }}</a> {{ n.email }}</p>
+                <p class="last"></p>
+            </div>
+			<div class="clear"></div>
+        </li>
+	{% endfor %}
+    {% elif vendors %}
+ 	{% for n in vendors %}
+        <li>
+            <div class="article-panel">
+                <p class="first"><a href="{{ n.get_absolute_url }}">{{ n.name }}</a> {{ n.email }}</p>
+                <p class="last"></p>
+            </div>
+			<div class="clear"></div>
+        </li>
+	{% endfor %}
+    {% endif %}
+</ul>
+{% endblock %}

@@ -1,0 +1,6 @@
+    <ul id="leftchapters">
+		<li class="share"></li>
+        {% for m in left_menu %}
+            <li><a href="{% url m.url_name %}">{{ m.title }}</a></li>
+        {% endfor %}
+	</ul>

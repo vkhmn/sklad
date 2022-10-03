@@ -17,16 +17,16 @@ class BuyerAddForm(forms.ModelForm):
 class VendorAddForm(forms.ModelForm):
     class Meta:
         model = Vendor
-        fields = '__all__'
+        fields = ['name', 'address', 'bank_details', 'fio', 'email', 'phone', 'category']
 
 
 class DeliveryAddForm(forms.ModelForm):
     class Meta:
         model = Document
-        fields = '__all__'
+        fields = ['vendor', 'nomenclatures']
 
 
 class ShipmentAddForm(forms.ModelForm):
     class Meta:
         model = Document
-        fields = '__all__'
+        fields = ['buyer', 'nomenclatures']

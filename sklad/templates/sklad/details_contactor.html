@@ -1,0 +1,23 @@
+{% extends 'sklad/base.html' %}
+
+{% block left_menu %}
+    {% include 'sklad/left_menu.html' %}
+{% endblock %}
+
+{% block content %}
+    {% if buyer %}
+        <h1>Сведения о покупателе</h1>
+        <p>ФИО: {{buyer.fio}}</p>
+        <p>Email: {{buyer.email}}</p>
+        <p>Телефон: {{buyer.phone}}</p>
+        <p></p>
+        <p>Последние заявки</p>
+     {% elif vendor %}
+        <h1>Сведения о поставщике</h1>
+        <p>ФИО: {{vendor.fio}}</p>
+        <p>Email: {{vendor.email}}</p>
+        <p>Телефон: {{vendor.phone}}</p>
+        <p></p>
+        <p>Последние заявки</p>
+    {% endif %}
+{% endblock %}

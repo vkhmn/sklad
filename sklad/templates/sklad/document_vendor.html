@@ -1,0 +1,10 @@
+<h1>Заявка на поставку</h1>
+<p>Номер заявки: {{document.pk}}</p>
+<p>Дата: {{document.time_create}}</p>
+<p>Поставщик: {{document.buyer}}</p>
+<p>Список товара: {{document.nomenclatures}}</p>
+<p>Цена: {{document.price}}</p>
+<p>Статус: {{document.get_status_display}}</p>
+{% if document.status == 'va' %}
+<p><a href="">Подтвердить получение товара</a></p>
+{% endif %}

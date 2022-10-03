@@ -96,6 +96,9 @@ class Buyer(Contactor):
         verbose_name = 'Покупатель'
         verbose_name_plural = 'Покупатели'
 
+    def get_absolute_url(self):
+        return reverse('buyer', kwargs={'pk': self.pk})
+
 
 class BankDetails(models.Model):
     """ Банковские реквизиты """
@@ -104,7 +107,7 @@ class BankDetails(models.Model):
     bank_name = models.CharField('Наименование банка', max_length=100)
 
     def __str__(self):
-        return self.bank_name
+        return f'{self.bank_name} {self.account}'
 
 
 class Vendor(Contactor):
@@ -125,6 +128,9 @@ class Vendor(Contactor):
     def __str__(self):
         return self.name
 
+    def get_absolute_url(self):
+        return reverse('vendor', kwargs={'pk': self.pk})
+
     class Meta:
         verbose_name = 'Поставщик'
         verbose_name_plural = 'Поставщики'
@@ -142,17 +148,19 @@ class Status(models.TextChoices):
 class Document(models.Model):
     """ Заявка на поставку/отгрузку товаров """
 
-    number = models.IntegerField('Номер заявки')
+    # number = models.IntegerField('Номер заявки')
     vendor = models.ForeignKey(
         Vendor,
-        on_delete=models.CASCADE,
-        default=None,
+        on_delete=models.DO_NOTHING,
+        blank=True,
+        null=True,
         verbose_name='Поставщик'
     )
     buyer = models.ForeignKey(
         Buyer,
-        on_delete=models.CASCADE,
-        default=None,
+        on_delete=models.DO_NOTHING,
+        blank=True,
+        null=True,
         verbose_name='Покупатель'
     )
     nomenclatures = models.ManyToManyField(
@@ -173,6 +181,9 @@ class Document(models.Model):
         verbose_name = 'Документ'
         verbose_name_plural = 'Документы'
 
+    def get_absolute_url(self):
+        return reverse('document', kwargs={'pk': self.pk})
+
 
 class DocumentNomenclatures(models.Model):
     """ Хранит номенклатуру и кол-во в документе """
@@ -187,4 +198,4 @@ class DocumentNomenclatures(models.Model):
         on_delete=models.CASCADE,
         verbose_name='Заявка'
     )
-    amount = models.IntegerField('Количество')
+    amount = models.IntegerField('Количество', default=1)

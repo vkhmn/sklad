@@ -2,6 +2,7 @@
 
 {% block content %}
     <h1 xmlns="http://www.w3.org/1999/html">{{ title }}</h1>
+    <p></p>
     <form action="{% url 'shipment_add' %}" method="post" enctype="multipart/form-data">
         {% csrf_token %}
         <div class="form-error">{{ form.non_field_errors }}</div>
@@ -11,5 +12,4 @@
         {% endfor %}
         <button type="submit">Добавить</button>
     </form>
-
 {% endblock %}

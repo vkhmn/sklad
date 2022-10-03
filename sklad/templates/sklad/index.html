@@ -1,5 +1,27 @@
 {% extends 'sklad/base.html' %}
 
+{% block left_menu %}
+    {% include 'sklad/left_menu.html' %}
+{% endblock %}
+
 {% block content %}
-Главная страница
+<h1>{{ title }}</h1>
+    {% if add_url %}
+        <a href={% url add_url %}><b>Создать заявку</b></a><br><br>
+    {% endif %}
+    <ul class="list-articles">
+{% for d in documents  %}
+<li>
+    <div class="article-panel">
+        {% if d.buyer %}
+            <p class="first">Отгрузка <a href="{{ d.get_absolute_url }}">Заявка № {{ d.pk }}</a> ({{ d.buyer }}) Статус: {{ d.get_status_display }}</p>
+        {% elif d.vendor %}
+            <p class="first">Поставка <a href="{{ d.get_absolute_url }}">Заявка № {{ d.pk }}</a> ({{ d.vendor }}) Статус: {{ d.get_status_display }}</p>
+        {% endif %}
+	    <p class="last">{{d.time_create|date:"d-m-Y H:i:s"}}</p>
+    </div>
+    <div class="clear"></div>
+</li>
+{% endfor %}
+</ul>
 {% endblock %}

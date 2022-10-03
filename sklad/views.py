@@ -12,10 +12,54 @@ class IndexView(DataMixin, ListView):
 
     model = Document
     template_name = 'sklad/index.html'
+    context_object_name = 'documents'
+    extra_context = {'title': 'Заявки на поставку/отгрузку'}
+    ordering = ['-time_create']
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
-        c_def = self.get_user_context(title="Главная страница")
+        c_def = self.get_user_context()
+        context = dict(list(context.items()) + list(c_def.items()))
+        return context
+
+
+class DeliveryListView(IndexView):
+    """"Веб сервис для работы с заявками на поставку."""
+    extra_context = {
+        'left_menu': [
+            {'url_name': 'delivery_add', 'title': 'Создать заявку'}
+        ],
+        'title': 'Заявки на поставку',
+    }
+
+    def get_queryset(self):
+        return Document.objects.filter(vendor__isnull=False).order_by('-time_create')
+
+
+class ShipmentListView(IndexView):
+    """"Веб сервис для работы с заявками."""
+    extra_context = {
+        'left_menu': [
+            {'url_name': 'shipment_add', 'title': 'Создать заявку'}
+        ],
+        'title': 'Заявки на отгрузку',
+    }
+
+    def get_queryset(self):
+        return Document.objects.filter(buyer__isnull=False).order_by('-time_create')
+
+
+class DocumentView(DataMixin, DetailView):
+    """" Веб сервис для работы с заявкой
+    на поставку/отгрузку (отображение карточки) """
+
+    model = Document
+    template_name = 'sklad/document.html'
+    context_object_name = 'document'
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        c_def = self.get_user_context(title="Информация по заявке")
         context = dict(list(context.items()) + list(c_def.items()))
         return context
 
@@ -34,76 +78,41 @@ class NomenclatureListView(DataMixin, ListView):
         context = dict(list(context.items()) + list(c_def.items()))
         return context
 
-    def get_queryset(self):
-        return Nomenclature.objects.all()
-
-
-class DeliveryListView(DataMixin, ListView):
-    """"Веб сервис для работы с заявками на поставку."""
-
-    model = Document
-    template_name = 'sklad/delivery_list.html'
-    context_object_name = 'deliveryes'
-
-    def get_context_data(self, *, object_list=None, **kwargs):
-        context = super().get_context_data(**kwargs)
-        c_def = self.get_user_context(title="Главная страница")
-        context = dict(list(context.items()) + list(c_def.items()))
-        return context
-
-    def get_queryset(self):
-        return Document.objects.all()
-
-
-class ShipmentListView(DataMixin, ListView):
-    """"Веб сервис для работы с заявками."""
-
-    model = Document
-    template_name = 'sklad/shipment_list.html'
-    context_object_name = 'shipments'
-
-    def get_context_data(self, *, object_list=None, **kwargs):
-        context = super().get_context_data(**kwargs)
-        c_def = self.get_user_context(title="Главная страница")
-        context = dict(list(context.items()) + list(c_def.items()))
-        return context
-
-    def get_queryset(self):
-        return Document.objects.all()
-
 
 class BuyerListView(DataMixin, ListView):
     """"Веб сервис для работы с покупателями"""
 
     model = Buyer
-    template_name = 'sklad/buyer_list.html'
+    template_name = 'sklad/contactor_list.html'
     context_object_name = 'buyers'
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
-        c_def = self.get_user_context(title="Главная страница")
+        c_def = self.get_user_context()
         context = dict(list(context.items()) + list(c_def.items()))
+        context['left_menu'] = [
+            {'url_name': 'buyer_add', 'title': 'Создать покупателя'}
+        ]
+        context['title'] = 'Покупатели'
         return context
-
-    def get_queryset(self):
-        return Buyer.objects.all()
 
 
 class VendorListView(DataMixin, ListView):
     """"Веб сервис для работы с поставщиками"""
 
     model = Vendor
-    template_name = 'sklad/vendor_list.html'
+    template_name = 'sklad/contactor_list.html'
     context_object_name = 'vendors'
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
         c_def = self.get_user_context(title="Главная страница")
         context = dict(list(context.items()) + list(c_def.items()))
+        context['left_menu'] = [
+            {'url_name': 'vendor_add', 'title': 'Создать поставщика'}
+        ]
+        context['title'] = 'Поставщики'
         return context
-
-    def get_queryset(self):
-        return Vendor.objects.all()
 
 
 class CategoryView(DataMixin, ListView):
@@ -146,8 +155,41 @@ class NomenclatureView(DataMixin, DetailView):
         context = dict(list(context.items()) + list(c_def.items()))
         return context
 
-    def get_queryset(self):
-        return Nomenclature.objects.filter(pk=self.kwargs['pk'])
+
+class BuyerView(DataMixin, DetailView):
+    """"Веб сервис для работы с покупателем
+      (отображение карточки)"""
+
+    model = Buyer
+    template_name = 'sklad/details_contactor.html'
+    context_object_name = 'buyer'
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        c_def = self.get_user_context(title="Сведения о покупателе")
+        context = dict(list(context.items()) + list(c_def.items()))
+        context['left_menu'] = [
+            {'url_name': 'buyer_add', 'title': 'Создать покупателя'}
+        ]
+        return context
+
+
+class VendorView(DataMixin, DetailView):
+    """"Веб сервис для работы с покупателем
+      (отображение карточки)"""
+
+    model = Vendor
+    template_name = 'sklad/details_contactor.html'
+    context_object_name = 'vendor'
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        c_def = self.get_user_context(title="Сведения о поставщике")
+        context = dict(list(context.items()) + list(c_def.items()))
+        context['left_menu'] = [
+            {'url_name': 'vendor_add', 'title': 'Создать поставщика'}
+        ]
+        return context
 
 
 class NomenklatureAddView(DataMixin, CreateView):
@@ -169,7 +211,7 @@ class BuyerAddView(DataMixin, CreateView):
     """"Веб сервис для добавления покупателя. """
 
     form_class = BuyerAddForm
-    template_name = 'sklad/buyer_add.html'
+    template_name = 'sklad/contactor_add.html'
     success_url = reverse_lazy('buyer_list')
 #    login_url = reverse_lazy('home')
     raise_exception = True
@@ -177,6 +219,9 @@ class BuyerAddView(DataMixin, CreateView):
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
         c_def = self.get_user_context(title='Добавление покупателя')
+        context['left_menu'] = [
+            {'url_name': 'buyer_add', 'title': 'Создать покупателя'}
+        ]
         return dict(list(context.items()) + list(c_def.items()))
 
 
@@ -184,7 +229,7 @@ class VendorAddView(DataMixin, CreateView):
     """"Веб сервис для добавления поставщика. """
 
     form_class = VendorAddForm
-    template_name = 'sklad/vendor_add.html'
+    template_name = 'sklad/contactor_add.html'
     success_url = reverse_lazy('vendor_list')
 #    login_url = reverse_lazy('home')
     raise_exception = True
@@ -192,6 +237,9 @@ class VendorAddView(DataMixin, CreateView):
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
         c_def = self.get_user_context(title='Добавление поставщика')
+        context['left_menu'] = [
+            {'url_name': 'vendor_add', 'title': 'Создать поставщика'}
+        ]
         return dict(list(context.items()) + list(c_def.items()))
 
 
@@ -208,24 +256,6 @@ class ShipmentAddView(DataMixin, CreateView):
         context = super().get_context_data(**kwargs)
         c_def = self.get_user_context(title='Создание заявки на отгрузку')
         return dict(list(context.items()) + list(c_def.items()))
-
-
-class ShipmentView(DataMixin, DetailView):
-    """"Веб сервис для работы с заявкой на отгрузку (отображение карточки)"""
-
-    model = Document
-    template_name = 'sklad/shipment.html'
-    context_object_name = 'shipment'
-
-    def get_context_data(self, *, object_list=None, **kwargs):
-        context = super().get_context_data(**kwargs)
-        c_def = self.get_user_context(title="")
-        context = dict(list(context.items()) + list(c_def.items()))
-        return context
-
-    def get_queryset(self):
-        return Shipment.objects.filter(pk=self.kwargs['pk'])
-
 
 
 class DeliveryAddView(DataMixin, CreateView):

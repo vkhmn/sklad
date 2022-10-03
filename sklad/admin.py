@@ -16,3 +16,13 @@ class CategoryAdmin(admin.ModelAdmin):
 class SubCategoryAdmin(admin.ModelAdmin):
     pass
 
+
+@admin.register(BankDetails)
+class BankDetailsAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(Document)
+class DocumentAdmin(admin.ModelAdmin):
+    pass
+

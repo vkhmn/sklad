@@ -1,5 +1,9 @@
 {% extends 'sklad/base.html' %}
 
+{% block left_menu %}
+    {% include 'sklad/left_menu.html' %}
+{% endblock %}
+
 {% block content %}
     <h1 xmlns="http://www.w3.org/1999/html">{{ title }}</h1>
     <form action="{% url 'buyer_add' %}" method="post" enctype="multipart/form-data">
