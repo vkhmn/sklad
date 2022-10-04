@@ -1,5 +1,6 @@
 from django.views.generic import ListView, DetailView, CreateView
 from django.urls import reverse_lazy
+from django.db.models import Count
 
 from sklad.models import *
 from sklad.utils import DataMixin
@@ -76,7 +77,17 @@ class NomenclatureListView(DataMixin, ListView):
         context = super().get_context_data(**kwargs)
         c_def = self.get_user_context(title="Главная страница")
         context = dict(list(context.items()) + list(c_def.items()))
+        context['subcats'] = SubCategory.objects.annotate(total=Count(
+            'nomenclature')
+        ).filter(total__gt=0).order_by('category__name', 'name')
         return context
+
+    def get_queryset(self):
+        return Nomenclature.objects.all().order_by(
+            'subcategory__category__name',
+            'subcategory__name',
+            'name'
+        )
 
 
 class BuyerListView(DataMixin, ListView):
@@ -127,10 +138,15 @@ class CategoryView(DataMixin, ListView):
         context = super().get_context_data(**kwargs)
         c_def = self.get_user_context(title="")
         context = dict(list(context.items()) + list(c_def.items()))
+        context['subcats'] = SubCategory.objects.annotate(total=Count(
+            'nomenclature')
+        ).filter(total__gt=0).order_by('category__name', 'name')
         return context
 
     def get_queryset(self):
-        return Nomenclature.objects.filter(subcategory__category=self.kwargs['pk'])
+        return Nomenclature.objects.filter(
+            subcategory__category=self.kwargs['pk']
+        ).order_by('subcategory__name', 'name')
 
 
 class SubCategoryView(CategoryView, ListView):
@@ -138,7 +154,9 @@ class SubCategoryView(CategoryView, ListView):
       (отображение, фильтрация) в зависимости от выбранной подкатегории."""
 
     def get_queryset(self):
-        return Nomenclature.objects.filter(subcategory=self.kwargs['pk'])
+        return Nomenclature.objects.filter(
+            subcategory=self.kwargs['pk']
+        ).order_by('name')
 
 
 class NomenclatureView(DataMixin, DetailView):
@@ -147,7 +165,7 @@ class NomenclatureView(DataMixin, DetailView):
 
     model = Nomenclature
     template_name = 'sklad/nomenclature.html'
-    context_object_name = 'post'
+    context_object_name = 'nomenclature'
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)

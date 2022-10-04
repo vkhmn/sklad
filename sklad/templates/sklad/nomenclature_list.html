@@ -1,52 +1,41 @@
 {% extends 'sklad/base.html' %}
 
 {% block left_menu %}
-    	<ul id="leftchapters">
-
+    <ul id="left-chapters">
         <li><a href="{% url 'nomenklature_add' %}">Добавить номенклатуру</a></li>
 
-{% if cat_selected == 0 %}
-		<li class="selected">Все категории</li>
-{% else %}
-		<li><a href="{% url 'home' %}">Все категории</a></li>
-{% endif %}
-{% for c in cats %}
-    {% if c.subcategory__nomenclature__count > 0 %}
-    <li><a href="{{ c.get_absolute_url }}">{{c.name}}</a></li>
-    {% for sc in subcats %}
-        {% if sc.nomenclature__count > 0 %}
-
-
-        {% if c.pk == sc.category_id %}
-            <p>* <a href="{{ sc.get_absolute_url }}">{{sc.name}}</a></p>
-        {% endif %}
-        {% endif %}
-
+    {% regroup subcats by category as categories %}
+    {% for category in categories %}
+        <li><a href="{{ category.grouper.get_absolute_url }}">{{ category.grouper }}</a></li>
+        <ul>
+        {% for subcategory in category.list %}
+            <li><a href="{{ subcategory.get_absolute_url }}">{{ subcategory }}</a></li>
+        {% endfor %}
+        </ul>
     {% endfor %}
-
-    {% endif %}
-
-{% endfor %}
-
-
-		<li class="share">
-		</li>
-	</ul>
-
+    </ul>
 {% endblock %}
 
 {% block content %}
-<ul class="list-articles">
-	{% for n in nomenclatures %}
-			<li><div class="article-panel">
-	<p class="first">Категория: {{ n.subcategory.category }}/{{ n.subcategory }}</p>
-	<p class="last">Дата: {{n.time_update|date:"d-m-Y H:i:s"}}</p>
-</div>
-                <p><a href="{{ n.get_absolute_url }}">{{ n.name }}</a>
-                    ({{ n.article }})
-                </p>
-			<div class="clear"></div>
-			</li>
-	{% endfor %}
+
+
+{% regroup nomenclatures by subcategory.category as categories %}
+<ul>
+{% for category in categories %}
+    <li>{{ category.grouper }}
+    <ul>
+        {% regroup category.list by subcategory as subcategories %}
+        {% for subcategory in subcategories %}
+            <li>{{ subcategory.grouper }}</li>
+            {% for nomenclature in subcategory.list %}
+                <div class="article-panel">
+                <p class="first"><a href="{{ nomenclature.get_absolute_url }}">{{ nomenclature.name }}</a>: {{ nomenclature.article }}</p>
+                </div>
+            {% endfor %}
+        {% endfor %}
+    </ul>
+    </li>
+{% endfor %}
 </ul>
+
 {% endblock %}

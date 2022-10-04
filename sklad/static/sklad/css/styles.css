@@ -44,7 +44,7 @@ p.link-read-post a {
 div.article-panel {
     background: #eee;
     padding: 5px 10px 5px 10px;
-    box-sizing border-box;
+    box-sizing: border-box;
     overflow: hidden;
     color: #555;
 }

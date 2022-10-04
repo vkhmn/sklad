@@ -15,13 +15,4 @@ class DataMixin:
     def get_user_context(self, **kwargs):
         context = kwargs
         context['menu'] = menu
-        context['subcats'] = SubCategory.objects.annotate(Count('nomenclature')).order_by('name')
-        context['cats'] = Category.objects.annotate(Count('subcategory__nomenclature')).order_by('name')
-
-        if 'cat_selected' not in context:
-            context['cat_selected'] = 0
-
-        if 'subcat_selected' not in context:
-            context['subcat_selected'] = 0
-
         return context
