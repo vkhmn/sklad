@@ -119,9 +119,9 @@ class Vendor(Contactor):
         Category,
         verbose_name='Категории'
     )
-    bank_details = models.ForeignKey(
+    bank_details = models.OneToOneField(
         BankDetails,
-        on_delete=models.CASCADE,
+        on_delete=models.DO_NOTHING,
         verbose_name='Банковские реквизиты'
     )
 

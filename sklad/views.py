@@ -1,6 +1,8 @@
 from django.views.generic import ListView, DetailView, CreateView
 from django.urls import reverse_lazy
 from django.db.models import Count
+from django.db import transaction
+
 
 from sklad.models import *
 from sklad.utils import DataMixin
@@ -240,6 +242,7 @@ class BuyerAddView(DataMixin, CreateView):
         context['left_menu'] = [
             {'url_name': 'buyer_add', 'title': 'Создать покупателя'}
         ]
+        context['url_name'] = 'buyer_add'
         return dict(list(context.items()) + list(c_def.items()))
 
 
@@ -258,6 +261,7 @@ class VendorAddView(DataMixin, CreateView):
         context['left_menu'] = [
             {'url_name': 'vendor_add', 'title': 'Создать поставщика'}
         ]
+        context['url_name'] = 'vendor_add'
         return dict(list(context.items()) + list(c_def.items()))
 
 

@@ -1,4 +1,5 @@
 from django import forms
+from django.db.models import Subquery
 from sklad.models import *
 
 
@@ -18,6 +19,11 @@ class VendorAddForm(forms.ModelForm):
     class Meta:
         model = Vendor
         fields = ['name', 'address', 'bank_details', 'fio', 'email', 'phone', 'category']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['bank_details'].queryset = BankDetails.objects.exclude(
+            pk__in=Subquery(Vendor.objects.values('bank_details')))
 
 
 class DeliveryAddForm(forms.ModelForm):
