@@ -5,7 +5,8 @@ from sklad.views import *
 
 urlpatterns = [
     path('', IndexView.as_view(), name='home'),  #
-    path('login', LoginView.as_view(), name='login'),
+    path('login', LoginUser.as_view(), name='login'),
+    path('logout/', logout_user, name='logout'),
     path('vendor/', VendorListView.as_view(), name='vendor_list'),  #
     path('vendor/add/', VendorAddView.as_view(), name='vendor_add'),  #
     path('vendor/<int:pk>/', VendorView.as_view(), name='vendor'),  #

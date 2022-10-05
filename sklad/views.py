@@ -1,15 +1,18 @@
+from django.contrib.auth import logout
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.views import LoginView
+from django.shortcuts import redirect
 from django.views.generic import ListView, DetailView, CreateView
 from django.urls import reverse_lazy
 from django.db.models import Count
-from django.db import transaction
 
 
 from sklad.models import *
-from sklad.utils import DataMixin
+from sklad.utils import DataMixin, SuperUserRequiredMixin
 from sklad.forms import *
 
 
-class IndexView(DataMixin, ListView):
+class IndexView(LoginRequiredMixin, DataMixin, ListView):
     """"Веб сервис отображающий главную страницу, с последними заявками на
     отгрузку (поставку) товара."""
 
@@ -18,6 +21,7 @@ class IndexView(DataMixin, ListView):
     context_object_name = 'documents'
     extra_context = {'title': 'Заявки на поставку/отгрузку'}
     ordering = ['-time_create']
+    login_url = reverse_lazy('login')
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -26,7 +30,7 @@ class IndexView(DataMixin, ListView):
         return context
 
 
-class DeliveryListView(IndexView):
+class DeliveryListView(SuperUserRequiredMixin, IndexView):
     """"Веб сервис для работы с заявками на поставку."""
     extra_context = {
         'left_menu': [
@@ -39,7 +43,7 @@ class DeliveryListView(IndexView):
         return Document.objects.filter(vendor__isnull=False).order_by('-time_create')
 
 
-class ShipmentListView(IndexView):
+class ShipmentListView(SuperUserRequiredMixin, IndexView):
     """"Веб сервис для работы с заявками."""
     extra_context = {
         'left_menu': [
@@ -52,13 +56,14 @@ class ShipmentListView(IndexView):
         return Document.objects.filter(buyer__isnull=False).order_by('-time_create')
 
 
-class DocumentView(DataMixin, DetailView):
+class DocumentView(LoginRequiredMixin, DataMixin, DetailView):
     """" Веб сервис для работы с заявкой
     на поставку/отгрузку (отображение карточки) """
 
     model = Document
     template_name = 'sklad/document.html'
     context_object_name = 'document'
+    login_url = reverse_lazy('login')
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -67,7 +72,7 @@ class DocumentView(DataMixin, DetailView):
         return context
 
 
-class NomenclatureListView(DataMixin, ListView):
+class NomenclatureListView(SuperUserRequiredMixin, DataMixin, ListView):
     """"Веб сервис для работы с номенклатурой
     (отображение, поиск, добавление)."""
 
@@ -92,7 +97,7 @@ class NomenclatureListView(DataMixin, ListView):
         )
 
 
-class BuyerListView(DataMixin, ListView):
+class BuyerListView(SuperUserRequiredMixin, DataMixin, ListView):
     """"Веб сервис для работы с покупателями"""
 
     model = Buyer
@@ -110,7 +115,7 @@ class BuyerListView(DataMixin, ListView):
         return context
 
 
-class VendorListView(DataMixin, ListView):
+class VendorListView(SuperUserRequiredMixin, DataMixin, ListView):
     """"Веб сервис для работы с поставщиками"""
 
     model = Vendor
@@ -128,7 +133,7 @@ class VendorListView(DataMixin, ListView):
         return context
 
 
-class CategoryView(DataMixin, ListView):
+class CategoryView(SuperUserRequiredMixin, DataMixin, ListView):
     """"Веб сервис для работы с номенклатурой
     (отображение, фильтрация) в зависимости от выбранной категории."""
 
@@ -161,7 +166,7 @@ class SubCategoryView(CategoryView, ListView):
         ).order_by('name')
 
 
-class NomenclatureView(DataMixin, DetailView):
+class NomenclatureView(SuperUserRequiredMixin, DataMixin, DetailView):
     """"Веб сервис для работы с номенклатурой
       (отображение карточки)"""
 
@@ -176,7 +181,7 @@ class NomenclatureView(DataMixin, DetailView):
         return context
 
 
-class BuyerView(DataMixin, DetailView):
+class BuyerView(SuperUserRequiredMixin, DataMixin, DetailView):
     """"Веб сервис для работы с покупателем
       (отображение карточки)"""
 
@@ -194,7 +199,7 @@ class BuyerView(DataMixin, DetailView):
         return context
 
 
-class VendorView(DataMixin, DetailView):
+class VendorView(SuperUserRequiredMixin, DataMixin, DetailView):
     """"Веб сервис для работы с покупателем
       (отображение карточки)"""
 
@@ -212,7 +217,7 @@ class VendorView(DataMixin, DetailView):
         return context
 
 
-class NomenklatureAddView(DataMixin, CreateView):
+class NomenklatureAddView(SuperUserRequiredMixin, DataMixin, CreateView):
     """"Веб сервис для добавления номенклатуры. """
 
     form_class = NomenklatureAddForm
@@ -227,7 +232,7 @@ class NomenklatureAddView(DataMixin, CreateView):
         return dict(list(context.items()) + list(c_def.items()))
 
 
-class BuyerAddView(DataMixin, CreateView):
+class BuyerAddView(SuperUserRequiredMixin, DataMixin, CreateView):
     """"Веб сервис для добавления покупателя. """
 
     form_class = BuyerAddForm
@@ -246,7 +251,7 @@ class BuyerAddView(DataMixin, CreateView):
         return dict(list(context.items()) + list(c_def.items()))
 
 
-class VendorAddView(DataMixin, CreateView):
+class VendorAddView(SuperUserRequiredMixin, DataMixin, CreateView):
     """"Веб сервис для добавления поставщика. """
 
     form_class = VendorAddForm
@@ -265,7 +270,7 @@ class VendorAddView(DataMixin, CreateView):
         return dict(list(context.items()) + list(c_def.items()))
 
 
-class ShipmentAddView(DataMixin, CreateView):
+class ShipmentAddView(SuperUserRequiredMixin, DataMixin, CreateView):
     """"Веб сервис для создания заявки на отгрузку. """
 
     form_class = ShipmentAddForm
@@ -280,7 +285,7 @@ class ShipmentAddView(DataMixin, CreateView):
         return dict(list(context.items()) + list(c_def.items()))
 
 
-class DeliveryAddView(DataMixin, CreateView):
+class DeliveryAddView(SuperUserRequiredMixin, DataMixin, CreateView):
     """"Веб сервис для создания заявки на поставку. """
 
     form_class = DeliveryAddForm
@@ -295,6 +300,19 @@ class DeliveryAddView(DataMixin, CreateView):
         return dict(list(context.items()) + list(c_def.items()))
 
 
-class LoginView(ListView):
-    model = Nomenclature
+class LoginUser(DataMixin, LoginView):
+    form_class = LoginUserForm
     template_name = 'sklad/login.html'
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        c_def = self.get_user_context(title="Авторизация")
+        return dict(list(context.items()) + list(c_def.items()))
+
+    def get_success_url(self):
+        return reverse_lazy('home')
+
+
+def logout_user(request):
+    logout(request)
+    return redirect('login')
