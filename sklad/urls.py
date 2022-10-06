@@ -18,6 +18,10 @@ urlpatterns = [
     path('delivery/', DeliveryListView.as_view(), name='delivery_list'),  #
     path('delivery/add/', DeliveryAddView.as_view(), name='delivery_add'),  #
     path('document/<int:pk>/', DocumentView.as_view(), name='document'),  #
+    path('document/<int:pk>/changestatus/<str:status>',
+         UpdateStatusDocumentView.as_view(),
+         name='document_change_status'
+    ),  #
     path('nomenclature/', NomenclatureListView.as_view(), name='nomenclature_list'),
     path('nomenclature/add/', NomenklatureAddView.as_view(), name='nomenklature_add'),
     path('nomenclature/<int:pk>/', NomenclatureView.as_view(), name='nomenclature'),

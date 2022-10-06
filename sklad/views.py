@@ -2,14 +2,15 @@ from django.contrib.auth import logout
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView
 from django.shortcuts import redirect
-from django.views.generic import ListView, DetailView, CreateView
+from django.views.generic import ListView, DetailView, CreateView, View
 from django.urls import reverse_lazy
 from django.db.models import Count
 
 
 from sklad.models import *
-from sklad.utils import DataMixin, SuperUserRequiredMixin
+from sklad.mixin import DataMixin, SuperUserRequiredMixin
 from sklad.forms import *
+from sklad.tasks import send_email_to_buyer
 
 
 class IndexView(LoginRequiredMixin, DataMixin, ListView):
@@ -316,3 +317,19 @@ class LoginUser(DataMixin, LoginView):
 def logout_user(request):
     logout(request)
     return redirect('login')
+
+
+class UpdateStatusDocumentView(DocumentView):
+    def get_context_data(self, *, object_list=None, **kwargs):
+        self.object.status = self.kwargs['status']
+        self.object.save()
+
+        if self.kwargs['status'] == Status.CANCELED:
+            send_email_to_buyer.delay(self.kwargs['pk'], Status.CANCELED)
+        elif self.kwargs['status'] == Status.COLLECTED:
+            send_email_to_buyer.delay(self.kwargs['pk'], Status.COLLECTED)
+
+        context = super().get_context_data(**kwargs)
+        c_def = self.get_user_context(title="Информация по заявке")
+        context = dict(list(context.items()) + list(c_def.items()))
+        return context

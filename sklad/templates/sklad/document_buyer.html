@@ -6,6 +6,6 @@
 <p>Цена: {{document.price}}</p>
 <p>Статус: {{document.get_status_display}}</p>
 {% if document.status == 'va' %}
-<p><a href="">Отказать в выполнении заказа</a></p>
-<p><a href="">Начать сборку заказа</a></p>
+<p><a href={% url 'document_change_status' document.pk 'ca' %}>Отказать в выполнении заказа</a></p>
+<p><a href={% url 'document_change_status' document.pk 'co' %}>Заказ собран</a></p>
 {% endif %}
