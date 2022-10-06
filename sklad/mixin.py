@@ -1,16 +1,7 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
 
-from sklad.models import *
-
-
-menu = [
-    {'url_name': 'vendor_list', 'title': 'Поставщики'},
-    {'url_name': 'buyer_list', 'title': 'Покупатели'},
-    {'url_name': 'nomenclature_list', 'title': 'Номеклатура'},
-    {'url_name': 'delivery_list', 'title': 'Поставка'},
-    {'url_name': 'shipment_list', 'title': 'Отгрузка'},
-]
+from sklad.enams import menu
 
 
 class SuperUserRequiredMixin(LoginRequiredMixin):
