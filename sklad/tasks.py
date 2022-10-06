@@ -1,30 +1,28 @@
 from django.core.mail import send_mail
+
 from sklad_django.celery import app
-from sklad.models import *
 from sklad_django.settings import EMAIL_HOST_USER
+from sklad.enams import messages
+from sklad.models import Document
 
 
 @app.task
 def send_email_to_buyer(document_id, status):
-    user_email = Document.objects.values(
-        'buyer__email').filter(pk=document_id).first()
-    user_email = user_email['buyer__email']
+    user_email = Document.objects.get(pk=document_id).buyer.email
 
-    messages = {
-        Status.COLLECTED: {
-            'header': 'Заказ собран',
-            'text': 'QR-code'
-        },
-        Status.CANCELED: {
-            'header': 'Заказ отменен',
-            'text': 'Нет товара на складе'
-        }
-    }
+    if not user_email:
+        raise ValueError('У покупателя нет email адреса')
 
-    send_mail(
-        messages[status]['header'],
-        messages[status]['text'],
-        EMAIL_HOST_USER,
-        [user_email],
-        fail_silently=False,
-    )
+    try:
+        subject = messages[status]['subject']
+        message = messages[status]['message']
+    except KeyError as e:
+        print(f'Нет одного из ключей: {status}, subject, message')
+    else:
+        send_mail(
+            subject,
+            message,
+            EMAIL_HOST_USER,
+            [user_email],
+            fail_silently=False,
+        )

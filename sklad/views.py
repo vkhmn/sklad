@@ -1,6 +1,7 @@
 from django.contrib.auth import logout
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView
+from django.http import Http404
 from django.shortcuts import redirect
 from django.views.generic import ListView, DetailView, CreateView, View
 from django.urls import reverse_lazy
@@ -321,13 +322,17 @@ def logout_user(request):
 
 class UpdateStatusDocumentView(DocumentView):
     def get_context_data(self, *, object_list=None, **kwargs):
-        self.object.status = self.kwargs['status']
+        status = self.kwargs.get('status')
+        document_id = self.kwargs.get('pk')
+
+        if status not in Status:
+            raise Http404("Status code is not founded")
+
+        self.object.status = status
         self.object.save()
 
-        if self.kwargs['status'] == Status.CANCELED:
-            send_email_to_buyer.delay(self.kwargs['pk'], Status.CANCELED)
-        elif self.kwargs['status'] == Status.COLLECTED:
-            send_email_to_buyer.delay(self.kwargs['pk'], Status.COLLECTED)
+        if status in (Status.CANCELED, Status.COLLECTED):
+            send_email_to_buyer.delay(document_id, status)
 
         context = super().get_context_data(**kwargs)
         c_def = self.get_user_context(title="Информация по заявке")
