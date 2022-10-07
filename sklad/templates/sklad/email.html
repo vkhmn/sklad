@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+<h1>{{ subject }}</h1>
+<p>{{ message|linebreaks }}</p>>
+<p></p>
+{% if img %}
+    <img src="data:image/png;base64,{{ img }}" />
+{% endif %}
+</body>
+</html>
