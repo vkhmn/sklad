@@ -4,7 +4,8 @@ from sklad.models import Status
 messages = {
     Status.COLLECTED: {
         'subject': 'Заказ собран',
-        'message': 'QR-code'
+        'message': 'Ваш заказ собран!\n'
+                   'Отсканируйте qr код, и подтвердите получение заказа! '
     },
     Status.CANCELED: {
         'subject': 'Заказ отменен',

@@ -6,10 +6,11 @@
 </head>
 <body>
 <h1>{{ subject }}</h1>
-<p>{{ message|linebreaks }}</p>>
+<p>{{ message|linebreaks }}</p>
 <p></p>
-{% if img %}
-    <img src="data:image/png;base64,{{ img }}" />
+<a href="{{ url }}">Подтвердить</a>
+{% if qrcode %}
+    <img src="data:image/png;base64,{{ qrcode }}" />
 {% endif %}
 </body>
 </html>

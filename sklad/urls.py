@@ -22,6 +22,7 @@ urlpatterns = [
          UpdateStatusDocumentView.as_view(),
          name='document_change_status'
     ),  #
+    path('document/confirm/', ConfirmView.as_view(), name='document_confirm'),  #
     path('nomenclature/', NomenclatureListView.as_view(), name='nomenclature_list'),
     path('nomenclature/add/', NomenklatureAddView.as_view(), name='nomenklature_add'),
     path('nomenclature/<int:pk>/', NomenclatureView.as_view(), name='nomenclature'),

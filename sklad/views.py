@@ -1,17 +1,17 @@
 from django.contrib.auth import logout
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView
-from django.http import Http404
-from django.shortcuts import redirect
-from django.views.generic import ListView, DetailView, CreateView, View
+from django.http import Http404, HttpResponse
+from django.shortcuts import redirect, get_object_or_404
+from django.views.generic import ListView, DetailView, CreateView, TemplateView, FormView
 from django.urls import reverse_lazy
 from django.db.models import Count
 
-
-from sklad.models import *
+# from sklad.models import *
 from sklad.mixin import DataMixin, SuperUserRequiredMixin
 from sklad.forms import *
 from sklad.tasks import send_email_to_buyer
+from sklad.utils import decode
 
 
 class IndexView(LoginRequiredMixin, DataMixin, ListView):
@@ -313,6 +313,36 @@ class LoginUser(DataMixin, LoginView):
 
     def get_success_url(self):
         return reverse_lazy('home')
+
+
+class ConfirmView(DataMixin, TemplateView):
+    template_name = 'sklad/document_confirm.html'
+    context_object_name = 'document'
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        c_def = self.get_user_context(title="Подтвеждение получения товара")
+        return dict(list(context.items()) + list(c_def.items()))
+
+    def post(self, request, *args, **kwargs):
+        code = request.POST.get('code')
+        print(code)
+        if not code:
+            raise Http404
+
+        document_id = decode(code)
+        d = get_object_or_404(Document, pk=document_id)
+        d.status = Status.FINISHED
+        d.save()
+
+        return HttpResponse('Thanks')
+
+    def get(self, request, *args, **kwargs):
+        code = request.GET.get('code')
+        if not code:
+            raise Http404
+
+        return super().get(request, *args, **kwargs)
 
 
 def logout_user(request):

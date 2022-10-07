@@ -17,7 +17,7 @@ def send_email_to_buyer(document_id, status):
         raise ValueError('У покупателя нет email адреса')
 
     code = encode(document_id)
-    url = f'http://127.0.0.0:8000/document/confirm/?code={code}'
+    url = f'http://127.0.0.1:8000/document/confirm/?code={code}'
     qrcode = make_code(url)
 
     try:
@@ -25,6 +25,7 @@ def send_email_to_buyer(document_id, status):
             'subject': messages[status]['subject'],
             'message': messages[status]['message'],
             'qrcode': qrcode,
+            'url': url,
         }
     except KeyError:
         print(f'Нет одного из ключей: {status}, subject, message')
