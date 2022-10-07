@@ -303,6 +303,8 @@ class DeliveryAddView(SuperUserRequiredMixin, DataMixin, CreateView):
 
 
 class LoginUser(DataMixin, LoginView):
+    """ Веб сервис для авторизации. """
+
     form_class = LoginUserForm
     template_name = 'sklad/login.html'
 
@@ -316,6 +318,8 @@ class LoginUser(DataMixin, LoginView):
 
 
 class ConfirmView(DataMixin, TemplateView):
+    """ Веб сервис для подтвеждения заказа покупателем """
+
     template_name = 'sklad/document_confirm.html'
     context_object_name = 'document'
 
@@ -325,37 +329,40 @@ class ConfirmView(DataMixin, TemplateView):
         return dict(list(context.items()) + list(c_def.items()))
 
     def post(self, request, *args, **kwargs):
+        context = self.get_context_data(**kwargs)
         code = request.POST.get('code')
-        print(code)
         if not code:
             raise Http404
-
         document_id = decode(code)
-
         d = get_object_or_404(Document, pk=document_id)
-
+        context['document_id'] = document_id
         if d.status != Status.COLLECTED:
             raise Http404
-
         d.status = Status.FINISHED
         d.save()
-
-        return HttpResponse('Спасибо, что подтвердили заказ!')
+        return self.render_to_response(context)
 
     def get(self, request, *args, **kwargs):
         code = request.GET.get('code')
         if not code:
             raise Http404
-
-        return super().get(request, *args, **kwargs)
+        context = self.get_context_data(**kwargs)
+        document_id = decode(code)
+        get_object_or_404(Document, pk=document_id)
+        context['document_id'] = document_id
+        return self.render_to_response(context)
 
 
 def logout_user(request):
+    """ Выход пользователя из аккаунта """
+
     logout(request)
     return redirect('login')
 
 
 class UpdateStatusDocumentView(DocumentView):
+    """ Веб сервис для обновления статуса заказа отгрузки """
+
     def get_context_data(self, *, object_list=None, **kwargs):
         status = self.kwargs.get('status')
         document_id = self.kwargs.get('pk')
