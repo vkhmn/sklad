@@ -198,6 +198,8 @@ class BuyerView(SuperUserRequiredMixin, DataMixin, DetailView):
         context['left_menu'] = [
             {'url_name': 'buyer_add', 'title': 'Создать покупателя'}
         ]
+        context['documents'] = Document.objects.filter(
+            buyer=self.object).order_by('-time_create')
         return context
 
 
@@ -216,6 +218,9 @@ class VendorView(SuperUserRequiredMixin, DataMixin, DetailView):
         context['left_menu'] = [
             {'url_name': 'vendor_add', 'title': 'Создать поставщика'}
         ]
+        context['documents'] = Document.objects.filter(
+            vendor=self.object).order_by('-time_create')
+
         return context
 
 
