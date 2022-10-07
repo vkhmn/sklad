@@ -6,6 +6,7 @@ from sklad_django.settings import EMAIL_HOST_USER
 from sklad.enams import messages
 from sklad.models import Document
 from sklad.qr import make_code
+from sklad.utils import encode
 
 
 @app.task
@@ -15,14 +16,15 @@ def send_email_to_buyer(document_id, status):
     if not user_email:
         raise ValueError('У покупателя нет email адреса')
 
-    uuid = 12121212
-    url = f'http://127.0.0.0:8000/document/{document_id}/confirm/?code={uuid}'
+    code = encode(document_id)
+    url = f'http://127.0.0.0:8000/document/confirm/?code={code}'
+    qrcode = make_code(url)
 
     try:
         context = {
             'subject': messages[status]['subject'],
             'message': messages[status]['message'],
-            'img': make_code(url),
+            'qrcode': qrcode,
         }
     except KeyError:
         print(f'Нет одного из ключей: {status}, subject, message')
