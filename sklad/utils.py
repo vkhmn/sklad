@@ -4,7 +4,10 @@ SOLT = 'DF'
 
 
 def decode(code):
-    return base64.b64decode(bytes.fromhex(code)).decode().replace(SOLT, '')
+    try:
+        return base64.b64decode(bytes.fromhex(code)).decode().replace(SOLT, '')
+    except ValueError:
+        return None
 
 
 def encode(document_id):

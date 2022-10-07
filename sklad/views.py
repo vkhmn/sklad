@@ -331,11 +331,16 @@ class ConfirmView(DataMixin, TemplateView):
             raise Http404
 
         document_id = decode(code)
+
         d = get_object_or_404(Document, pk=document_id)
+
+        if d.status != Status.COLLECTED:
+            raise Http404
+
         d.status = Status.FINISHED
         d.save()
 
-        return HttpResponse('Thanks')
+        return HttpResponse('Спасибо, что подтвердили заказ!')
 
     def get(self, request, *args, **kwargs):
         code = request.GET.get('code')
