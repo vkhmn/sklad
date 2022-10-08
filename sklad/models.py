@@ -70,7 +70,10 @@ class Store(models.Model):
         on_delete=models.CASCADE,
         verbose_name='Номенклатура'
     )
-    amount = models.IntegerField('Количество')
+    amount = models.IntegerField(
+        'Количество',
+        default=0
+    )
 
     def __str__(self):
         return f'{self.nomenclature} - {self.amount}'

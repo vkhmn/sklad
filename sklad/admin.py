@@ -26,3 +26,7 @@ class BankDetailsAdmin(admin.ModelAdmin):
 class DocumentAdmin(admin.ModelAdmin):
     pass
 
+
+@admin.register(Store)
+class DocumentAdmin(admin.ModelAdmin):
+    pass
