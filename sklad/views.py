@@ -5,7 +5,7 @@ from django.http import Http404, HttpResponse
 from django.shortcuts import redirect, get_object_or_404
 from django.views.generic import ListView, DetailView, CreateView, TemplateView, FormView
 from django.urls import reverse_lazy
-from django.db.models import Count
+from django.db.models import Count, Sum, F
 
 # from sklad.models import *
 from sklad.mixin import DataMixin, SuperUserRequiredMixin
@@ -180,6 +180,22 @@ class NomenclatureView(SuperUserRequiredMixin, DataMixin, DetailView):
         context = super().get_context_data(**kwargs)
         c_def = self.get_user_context(title="")
         context = dict(list(context.items()) + list(c_def.items()))
+
+        subcategories = SubCategory.objects.filter(
+            category=self.object.subcategory.category)
+
+        context['subcategories'] = subcategories
+
+        context['store'], _ = Store.objects.get_or_create(
+            nomenclature=self.object)
+
+        nomenclatures = Nomenclature.objects.filter(
+            subcategory__in=subcategories)
+
+        context['total_category'] = Store.objects.filter(
+            nomenclature__in=nomenclatures).aggregate(
+            sum=Sum(F('nomenclature__price') * F('amount'))).get('sum')
+
         return context
 
 

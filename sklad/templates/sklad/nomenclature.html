@@ -1,8 +1,21 @@
 {% extends 'sklad/base.html' %}
 
 {% block content %}
-<p>{{nomenclature.name}}</p>
-<p>{{nomenclature.article}}</p>
-<p>{{nomenclature.amount}}</p>
-<p>{{nomenclature.price}}</p>
+    <p>Категория/Подкатегория: {{ nomenclature.subcategory.category }} / {{ nomenclature.subcategory }} </p>
+
+
+<p>Стоимость товара в категории: {{ total_category }}</p>
+<p>Подкатегории:
+    {% for subcategory in subcategories %}
+        {% if forloop.last %}
+            {{ subcategory }}
+        {% else %}
+            {{ subcategory }},
+        {% endif %}
+    {% endfor %}
+</p>
+<p>Наименование товара: {{nomenclature.name}}</p>
+<p>Артикул товара: {{nomenclature.article}}</p>
+<p>Количество товара на складе: {{store.amount}}</p>
+<p>Стоимость: {{nomenclature.price}}</p>
 {% endblock %}
