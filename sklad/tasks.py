@@ -5,8 +5,7 @@ from sklad_django.celery import app
 from sklad_django.settings import EMAIL_HOST_USER
 from sklad.enams import messages
 from sklad.models import Document
-from sklad.qr import make_code
-from sklad.utils import encode
+from sklad.utils import get_confirm_url, make_qrcode
 
 
 @app.task
@@ -16,21 +15,17 @@ def send_email_to_buyer(document_id, status):
     if not user_email:
         raise ValueError('У покупателя нет email адреса')
 
-    code = encode(document_id)
-    url = f'http://127.0.0.1:8000/document/confirm/?code={code}'
-    qrcode = make_code(url)
-
+    context = dict()
     try:
-        context = {
-            'subject': messages[status]['subject'],
-            'message': messages[status]['message'],
-            'qrcode': qrcode,
-            'url': url,
-        }
+        context['subject'] = messages[status]['subject']
+        context['message'] = messages[status]['message']
     except KeyError:
         print(f'Нет одного из ключей: {status}, subject, message')
     else:
+        context['qrcode'] = make_qrcode(document_id)
+        context['url'] = get_confirm_url(document_id)
         html_message = render_to_string('sklad/email.html', context)
+
         send_mail(
             context['subject'],
             None,

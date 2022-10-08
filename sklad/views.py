@@ -11,7 +11,7 @@ from django.db.models import Count, Sum, F
 from sklad.mixin import DataMixin, SuperUserRequiredMixin
 from sklad.forms import *
 from sklad.tasks import send_email_to_buyer
-from sklad.utils import decode
+from sklad.utils import decode, make_qrcode
 
 
 class IndexView(LoginRequiredMixin, DataMixin, ListView):
@@ -71,6 +71,7 @@ class DocumentView(LoginRequiredMixin, DataMixin, DetailView):
         context = super().get_context_data(**kwargs)
         c_def = self.get_user_context(title="Информация по заявке")
         context = dict(list(context.items()) + list(c_def.items()))
+        context['qrcode'] = make_qrcode(self.object.pk)
         return context
 
 
@@ -389,6 +390,9 @@ class UpdateStatusDocumentView(DocumentView):
         document_id = self.kwargs.get('pk')
 
         if status not in Status:
+            raise Http404("Status code is not founded")
+
+        if self.object.status in (Status.FINISHED, status):
             raise Http404("Status code is not founded")
 
         self.object.status = status
