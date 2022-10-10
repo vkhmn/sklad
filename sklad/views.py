@@ -5,7 +5,7 @@ from django.http import Http404, HttpResponse
 from django.shortcuts import redirect, get_object_or_404
 from django.views.generic import ListView, DetailView, CreateView, TemplateView, FormView
 from django.urls import reverse_lazy
-from django.db.models import Count, Sum, F
+from django.db.models import Count, Sum, F, Min
 
 # from sklad.models import *
 from sklad.mixin import DataMixin, SuperUserRequiredMixin
@@ -72,17 +72,21 @@ class DocumentView(LoginRequiredMixin, DataMixin, DetailView):
         c_def = self.get_user_context(title="Информация по заявке")
         context = dict(list(context.items()) + list(c_def.items()))
         context['qrcode'] = make_qrcode(self.object.pk)
-        context['total'] = self.object.nomenclatures.aggregate(
-            sum=Sum(F('documentnomenclatures__amount') * F('price'))).get('sum')
 
+        # Select Sum(price * amount), Min(store.amount - amount)
+        # for document.nomenclatures
+        context['total'] = self.object.nomenclatures.aggregate(
+            sum=Sum(F('documentnomenclatures__amount') * F('price')),
+            min=Min(F('store__amount') - F('documentnomenclatures__amount'))
+        )
+
+        # Select price * amount, amount, store.amount
+        # for each document.nomenclatures
         context['result'] = self.object.nomenclatures.annotate(
             total=F('documentnomenclatures__amount') * F('price'),
             amount=F('documentnomenclatures__amount') * 1,
             store_amount=F('store__amount') * 1
         )
-
-        print(context['result'])
-        print(self.object.status)
         return context
 
 
@@ -104,7 +108,8 @@ class NomenclatureListView(SuperUserRequiredMixin, DataMixin, ListView):
         return context
 
     def get_queryset(self):
-        return Nomenclature.objects.all().order_by(
+        return Nomenclature.objects.annotate(
+            store_amount=F('store__amount')).order_by(
             'subcategory__category__name',
             'subcategory__name',
             'name'
@@ -166,8 +171,11 @@ class CategoryView(SuperUserRequiredMixin, DataMixin, ListView):
 
     def get_queryset(self):
         return Nomenclature.objects.filter(
-            subcategory__category=self.kwargs['pk']
-        ).order_by('subcategory__name', 'name')
+            subcategory__category=self.kwargs['pk']).annotate(
+            store_amount=F('store__amount')).order_by(
+            'subcategory__name',
+            'name'
+        )
 
 
 class SubCategoryView(CategoryView, ListView):
@@ -177,7 +185,7 @@ class SubCategoryView(CategoryView, ListView):
     def get_queryset(self):
         return Nomenclature.objects.filter(
             subcategory=self.kwargs['pk']
-        ).order_by('name')
+        ).annotate(store_amount=F('store__amount')).order_by('name')
 
 
 class NomenclatureView(SuperUserRequiredMixin, DataMixin, DetailView):

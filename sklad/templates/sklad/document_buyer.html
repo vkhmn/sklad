@@ -4,23 +4,22 @@
 <p>Покупатель: {{document.buyer}}</p>
 <p>Список товаров: </p>
 {% for item in result %}
-    {% if item.store_amount > item.amount and document.status == 've'%}
-        <p> {{ item.name }} {{ item.price }}р. {{ item.amount }} шт. {{ item.total }}р. </p>
-        {% else %}
-        <p> {{ item.name }} {{ item.price }}р. {{ item.amount }} шт. (В наличии {{ item.store_amount }} шт.) {{ item.total }}р. </p>
+    {% if item.store_amount < item.amount and document.status == 'va'%}
+        <p> {{ item.name }} {{ item.price }} р. {{ item.amount }} шт. (В наличии {{ item.store_amount }} шт.) {{ item.total }} р. </p>
+    {% else %}
+        <p> {{ item.name }} {{ item.price }} р. {{ item.amount }} шт. {{ item.total }} р. </p>
     {% endif %}
 {% endfor %}
 -------
-<p>Цена: {{total}}</p>
+<p>Цена: {{total.sum}} р.</p>
 <p>Статус: {{document.get_status_display}}</p>
 {% if document.status in 'co,fi' %}
-    <p>
-        <img src="data:image/png;base64,{{ qrcode }}" width="100" height="100"/></p>
+    <p><img src="data:image/png;base64,{{ qrcode }}" width="100" height="100"/></p>
 {% endif %}
-
 {% if document.status == 'va' %}
+    -------
     <p><a href={% url 'document_change_status' document.pk 'ca' %}>Отказать в выполнении заказа</a></p>
-    {% if item.store_amount > item.amount %}
+    {% if total.min >= 0 %}
         <p><a href={% url 'document_change_status' document.pk 'co' %}>Заказ собран</a></p>
     {% endif %}
 {% endif %}
