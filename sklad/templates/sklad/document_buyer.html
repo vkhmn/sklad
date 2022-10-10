@@ -2,8 +2,16 @@
 <p>Номер заявки: {{document.pk}}</p>
 <p>Дата: {{document.time_create}}</p>
 <p>Покупатель: {{document.buyer}}</p>
-<p>Список товара: {{document.nomenclatures}}</p>
-<p>Цена: {{document.price}}</p>
+<p>Список товаров: </p>
+{% for item in result %}
+    {% if item.store_amount > item.amount and document.status == 've'%}
+        <p> {{ item.name }} {{ item.price }}р. {{ item.amount }} шт. {{ item.total }}р. </p>
+        {% else %}
+        <p> {{ item.name }} {{ item.price }}р. {{ item.amount }} шт. (В наличии {{ item.store_amount }} шт.) {{ item.total }}р. </p>
+    {% endif %}
+{% endfor %}
+-------
+<p>Цена: {{total}}</p>
 <p>Статус: {{document.get_status_display}}</p>
 {% if document.status in 'co,fi' %}
     <p>
@@ -11,7 +19,8 @@
 {% endif %}
 
 {% if document.status == 'va' %}
-<p><a href={% url 'document_change_status' document.pk 'ca' %}>Отказать в выполнении заказа</a></p>
-<p><a href={% url 'document_change_status' document.pk 'co' %}>Заказ собран</a></p>
-
+    <p><a href={% url 'document_change_status' document.pk 'ca' %}>Отказать в выполнении заказа</a></p>
+    {% if item.store_amount > item.amount %}
+        <p><a href={% url 'document_change_status' document.pk 'co' %}>Заказ собран</a></p>
+    {% endif %}
 {% endif %}

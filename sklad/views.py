@@ -76,8 +76,9 @@ class DocumentView(LoginRequiredMixin, DataMixin, DetailView):
             sum=Sum(F('documentnomenclatures__amount') * F('price'))).get('sum')
 
         context['result'] = self.object.nomenclatures.annotate(
-            total=Sum(F('documentnomenclatures__amount') * F('price')),
-            amount=F('documentnomenclatures__amount') * 1
+            total=F('documentnomenclatures__amount') * F('price'),
+            amount=F('documentnomenclatures__amount') * 1,
+            store_amount=F('store__amount') * 1
         )
 
         print(context['result'])
@@ -403,13 +404,33 @@ class UpdateStatusDocumentView(DocumentView):
             raise Http404("Status code is not founded")
 
         if self.object.status in (Status.FINISHED, status):
-            raise Http404("Status code is not founded")
+            raise Http404("Can't change Status code")
 
         self.object.status = status
         self.object.save()
 
-        if status in (Status.CANCELED, Status.COLLECTED):
-            send_email_to_buyer.delay(document_id, status)
+        if self.object.vendor is not None:
+            if status in (Status.FINISHED, ):
+                # Add nomenclatures amount to Store
+                for item in self.object.nomenclatures.all():
+                    Store.objects.filter(nomenclature=item).update(
+                        amount=F('amount') + DocumentNomenclatures.objects.get(
+                            nomenclature=item, document=self.object
+                        ).amount
+                    )
+
+        if self.object.buyer is not None:
+            if status in (Status.CANCELED, Status.COLLECTED):
+                send_email_to_buyer.delay(document_id, status)
+
+            if status in (Status.COLLECTED):
+                # Sub nomenclatures amount to Store (Reserve)
+                for item in self.object.nomenclatures.all():
+                    Store.objects.filter(nomenclature=item).update(
+                        amount=F('amount') - DocumentNomenclatures.objects.get(
+                            nomenclature=item, document=self.object
+                        ).amount
+                    )
 
         context = super().get_context_data(**kwargs)
         c_def = self.get_user_context(title="Информация по заявке")
