@@ -27,6 +27,11 @@ class DocumentAdmin(admin.ModelAdmin):
     pass
 
 
+@admin.register(DocumentNomenclatures)
+class DocumentNomenclaturesAdmin(admin.ModelAdmin):
+    pass
+
+
 @admin.register(Store)
 class DocumentAdmin(admin.ModelAdmin):
     pass

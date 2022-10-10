@@ -2,8 +2,12 @@
 <p>Номер заявки: {{document.pk}}</p>
 <p>Дата: {{document.time_create}}</p>
 <p>Поставщик: {{document.vendor}}</p>
-<p>Список товара: {{document.nomenclatures}}</p>
-<p>Цена: {{document.price}}</p>
+<p>Список товаров: </p>
+{% for item in result %}
+    <p> {{ item.name }} {{ item.price }}р. {{ item.amount }} шт. {{ item.total }}р. </p>
+{% endfor %}
+-------
+<p>Стоимость: {{ total }}</p>
 <p>Статус: {{document.get_status_display}}</p>
 {% if document.status == 'va' %}
 <p><a href="">Подтвердить получение товара</a></p>

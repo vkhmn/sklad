@@ -72,6 +72,16 @@ class DocumentView(LoginRequiredMixin, DataMixin, DetailView):
         c_def = self.get_user_context(title="Информация по заявке")
         context = dict(list(context.items()) + list(c_def.items()))
         context['qrcode'] = make_qrcode(self.object.pk)
+        context['total'] = self.object.nomenclatures.aggregate(
+            sum=Sum(F('documentnomenclatures__amount') * F('price'))).get('sum')
+
+        context['result'] = self.object.nomenclatures.annotate(
+            total=Sum(F('documentnomenclatures__amount') * F('price')),
+            amount=F('documentnomenclatures__amount') * 1
+        )
+
+        print(context['result'])
+        print(self.object.status)
         return context
 
 
