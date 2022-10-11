@@ -295,43 +295,11 @@ class BuyerAddView(SuperUserRequiredMixin, DataMixin, CreateView):
         return dict(list(context.items()) + list(c_def.items()))
 
 
-def vendor_add_view(request):
-    if request.method == 'POST':
-        bank_details_form = BankDetailsAddForm(request.POST)
-        vendor_form = VendorAddForm(request.POST)
-        if bank_details_form.is_valid() or vendor_form.is_valid():
-            bd_form = bank_details_form.save(commit=False)
-            bank_details_form.save()
-            v_form = vendor_form.save(commit=False)
-            v_form.bank_details = bd_form
-            vendor_form.save()
-            return HttpResponseRedirect(reverse('vendor_list') )
-    else:
-        bank_details_form = BankDetailsAddForm()
-        vendor_form = VendorAddForm()
-        context = dict()
-        context['left_menu'] = [
-            {'url_name': 'vendor_add', 'title': 'Создать поставщика'}
-        ]
-        context['url_name'] = 'vendor_add'
-    return render(request, 'sklad/vendor_add.html', {
-        'bank_details_form': bank_details_form,
-        'vendor_form': vendor_form,
-        'url_name': 'vendor_add',
-        'left_menu': [{'url_name': 'vendor_add', 'title': 'Создать поставщика',}],
-        'title': 'Добавление поставщика',
-        'menu': menu,
-    })
-
-
-class VendorAddView(SuperUserRequiredMixin, DataMixin, CreateView):
+class VendorAddView(SuperUserRequiredMixin, DataMixin, TemplateView):
     """"Веб сервис для добавления поставщика. """
 
-    form_class = VendorAddForm
     template_name = 'sklad/vendor_add.html'
     success_url = reverse_lazy('vendor_list')
-#    login_url = reverse_lazy('home')
-    raise_exception = True
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -340,7 +308,20 @@ class VendorAddView(SuperUserRequiredMixin, DataMixin, CreateView):
             {'url_name': 'vendor_add', 'title': 'Создать поставщика'}
         ]
         context['url_name'] = 'vendor_add'
+        context['bank_details_form'] = BankDetailsAddForm()
+        context['vendor_form'] = VendorAddForm()
         return dict(list(context.items()) + list(c_def.items()))
+
+    def post(self, request, *args, **kwargs):
+        bank_details_form = BankDetailsAddForm(request.POST)
+        vendor_form = VendorAddForm(request.POST)
+        if bank_details_form.is_valid() or vendor_form.is_valid():
+            bd_form = bank_details_form.save(commit=False)
+            bank_details_form.save()
+            v_form = vendor_form.save(commit=False)
+            v_form.bank_details = bd_form
+            vendor_form.save()
+        return redirect(self.success_url)
 
 
 class ShipmentAddView(SuperUserRequiredMixin, DataMixin, CreateView):
