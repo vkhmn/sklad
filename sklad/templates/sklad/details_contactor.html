@@ -21,7 +21,7 @@
         <p>Email: {{vendor.email}}</p>
         <p>Телефон: {{vendor.phone}}</p>
         <b>Категории товаров:</b>
-        {% for cat in vendor.category.all %}
+        {% for cat in vendor.categories.all %}
             {% if forloop.last %}
                 {{ cat }}
             {% else %}

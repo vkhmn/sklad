@@ -1,13 +1,14 @@
 from django.contrib.auth import logout
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView
-from django.http import Http404, HttpResponse
-from django.shortcuts import redirect, get_object_or_404
+from django.http import Http404, HttpResponse, HttpResponseRedirect
+from django.shortcuts import redirect, get_object_or_404, render
 from django.views.generic import ListView, DetailView, CreateView, TemplateView, FormView
 from django.urls import reverse_lazy
 from django.db.models import Count, Sum, F, Min
 
 # from sklad.models import *
+from sklad.enams import menu
 from sklad.mixin import DataMixin, SuperUserRequiredMixin
 from sklad.forms import *
 from sklad.tasks import send_email_to_buyer
@@ -294,11 +295,40 @@ class BuyerAddView(SuperUserRequiredMixin, DataMixin, CreateView):
         return dict(list(context.items()) + list(c_def.items()))
 
 
+def vendor_add_view(request):
+    if request.method == 'POST':
+        bank_details_form = BankDetailsAddForm(request.POST)
+        vendor_form = VendorAddForm(request.POST)
+        if bank_details_form.is_valid() or vendor_form.is_valid():
+            bd_form = bank_details_form.save(commit=False)
+            bank_details_form.save()
+            v_form = vendor_form.save(commit=False)
+            v_form.bank_details = bd_form
+            vendor_form.save()
+            return HttpResponseRedirect(reverse('vendor_list') )
+    else:
+        bank_details_form = BankDetailsAddForm()
+        vendor_form = VendorAddForm()
+        context = dict()
+        context['left_menu'] = [
+            {'url_name': 'vendor_add', 'title': 'Создать поставщика'}
+        ]
+        context['url_name'] = 'vendor_add'
+    return render(request, 'sklad/vendor_add.html', {
+        'bank_details_form': bank_details_form,
+        'vendor_form': vendor_form,
+        'url_name': 'vendor_add',
+        'left_menu': [{'url_name': 'vendor_add', 'title': 'Создать поставщика',}],
+        'title': 'Добавление поставщика',
+        'menu': menu,
+    })
+
+
 class VendorAddView(SuperUserRequiredMixin, DataMixin, CreateView):
     """"Веб сервис для добавления поставщика. """
 
     form_class = VendorAddForm
-    template_name = 'sklad/contactor_add.html'
+    template_name = 'sklad/vendor_add.html'
     success_url = reverse_lazy('vendor_list')
 #    login_url = reverse_lazy('home')
     raise_exception = True

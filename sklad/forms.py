@@ -19,12 +19,18 @@ class BuyerAddForm(forms.ModelForm):
 class VendorAddForm(forms.ModelForm):
     class Meta:
         model = Vendor
-        fields = ['name', 'address', 'bank_details', 'fio', 'email', 'phone', 'category']
+        fields = ['name', 'address', 'fio', 'email', 'phone', 'categories']
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['bank_details'].queryset = BankDetails.objects.exclude(
-            pk__in=Subquery(Vendor.objects.values('bank_details')))
+#    def __init__(self, *args, **kwargs):
+#        super().__init__(*args, **kwargs)
+#        self.fields['bank_details'].queryset = BankDetails.objects.exclude(
+#            pk__in=Subquery(Vendor.objects.values('bank_details')))
+
+
+class BankDetailsAddForm(forms.ModelForm):
+    class Meta:
+        model = BankDetails
+        fields = ['account', 'bank_name']
 
 
 class DeliveryAddForm(forms.ModelForm):

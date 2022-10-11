@@ -22,6 +22,11 @@ class BankDetailsAdmin(admin.ModelAdmin):
     pass
 
 
+@admin.register(Vendor)
+class VendorAdmin(admin.ModelAdmin):
+    pass
+
+
 @admin.register(Document)
 class DocumentAdmin(admin.ModelAdmin):
     pass

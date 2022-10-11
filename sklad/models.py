@@ -118,7 +118,7 @@ class Vendor(Contactor):
 
     name = models.CharField('Наименование', max_length=100)
     address = models.CharField('Адрес', max_length=100)
-    category = models.ManyToManyField(
+    categories = models.ManyToManyField(
         Category,
         verbose_name='Категории'
     )

@@ -27,7 +27,7 @@
             <li>{{ subcategory.grouper }}</li>
             {% for nomenclature in subcategory.list %}
                 <div class="article-panel">
-                <p class="first"><a href="{{ nomenclature.get_absolute_url }}">{{ nomenclature.name }}</a>: {{ nomenclature.article }} / {{ nomenclature.store_amount }}</p>
+                <p class="first"><a href="{{ nomenclature.get_absolute_url }}">{{ nomenclature.name }}</a>: {{ nomenclature.article }} / Остаток ({{ nomenclature.store_amount }}) </p>
                 </div>
             {% endfor %}
         {% endfor %}
