@@ -1,14 +1,12 @@
 from django.contrib.auth import logout
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.auth.views import LoginView
+from django.contrib.auth.views import LoginView, LogoutView
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import redirect, get_object_or_404, render
-from django.views.generic import ListView, DetailView, CreateView, TemplateView, FormView
+from django.views.generic import ListView, DetailView, CreateView, TemplateView
 from django.urls import reverse_lazy
 from django.db.models import Count, Sum, F, Min
 
-# from sklad.models import *
-from sklad.enams import menu
 from sklad.mixin import DataMixin, SuperUserRequiredMixin
 from sklad.forms import *
 from sklad.tasks import send_email_to_buyer
@@ -416,6 +414,14 @@ class UpdateStatusDocumentView(DocumentView):
     """ Веб сервис для обновления статуса заказа отгрузки """
 
     def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        c_def = self.get_user_context(title="Информация по заявке")
+        context = dict(list(context.items()) + list(c_def.items()))
+        return context
+
+    def get(self, request, *args, **kwargs):
+        super().get(self, request, *args, **kwargs)
+
         status = self.kwargs.get('status')
         document_id = self.kwargs.get('pk')
 
@@ -450,8 +456,4 @@ class UpdateStatusDocumentView(DocumentView):
                             nomenclature=item, document=self.object
                         ).amount
                     )
-
-        context = super().get_context_data(**kwargs)
-        c_def = self.get_user_context(title="Информация по заявке")
-        context = dict(list(context.items()) + list(c_def.items()))
-        return context
+        return redirect(reverse('document', args={document_id: document_id}))
