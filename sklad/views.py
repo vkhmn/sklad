@@ -83,8 +83,8 @@ class DocumentView(LoginRequiredMixin, DataMixin, DetailView):
         # for each document.nomenclatures
         context['result'] = self.object.nomenclatures.annotate(
             total=F('documentnomenclatures__amount') * F('price'),
-            amount=F('documentnomenclatures__amount') * 1,
-            store_amount=F('store__amount') * 1
+            amount=F('documentnomenclatures__amount'),
+            store_amount=F('store__amount')
         )
         return context
 

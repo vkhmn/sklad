@@ -4,7 +4,7 @@
 <p>Поставщик: {{document.vendor}}</p>
 <p>Список товаров: </p>
 {% for item in result %}
-    <p> {{ item.name }} {{ item.price }} р. {{ item.amount }} шт. {{ item.total }} р. </p>
+    <p> <a href="{{ item.get_absolute_url }}">{{ item.name }}</a> {{ item.price }} р. {{ item.amount }} шт. {{ item.total }} р. </p>
 {% endfor %}
 -------
 <p>Стоимость: {{ total.sum }} р.</p>
