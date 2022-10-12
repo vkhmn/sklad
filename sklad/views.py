@@ -457,3 +457,34 @@ class UpdateStatusDocumentView(DocumentView):
                         ).amount
                     )
         return redirect(reverse('document', args={document_id: document_id}))
+
+
+from django.http import JsonResponse
+
+
+def ajax_view(request):
+    context = {}
+    return render(request, 'sklad/ajax.html', context=context)
+
+
+def search_result(request):
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        res = None
+        series = request.POST.get('series')
+        query_se = Nomenclature.objects.filter(name__icontains=series)
+        print('Is AJAX')
+        if len(query_se) > 0 and len(series) > 0:
+            data = []
+            for pos in query_se:
+                item = {
+                    'url': pos.get_absolute_url(),
+                    'name': pos.name,
+                }
+                data.append(item)
+            res = data
+        else:
+            res = 'No Nomenclature found'
+        print(res)
+        return JsonResponse({'data': res})
+    print({}, request.headers)
+    return JsonResponse({})

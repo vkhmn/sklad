@@ -28,4 +28,6 @@ urlpatterns = [
     path('nomenclature/<int:pk>/', NomenclatureView.as_view(), name='nomenclature'),
     path('category/<int:pk>/', CategoryView.as_view(), name='category'),
     path('subcategory/<int:pk>/', SubCategoryView.as_view(), name='subcategory'),
+    path('ajax/', ajax_view, name='ajax'),
+    path('search/', search_result, name='search')
 ]
