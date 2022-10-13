@@ -1,6 +1,8 @@
 from django import forms
 from django.contrib.auth.forms import AuthenticationForm
 from django.db.models import Subquery
+from django.forms import modelformset_factory, formset_factory
+
 from sklad.models import *
 
 
@@ -33,10 +35,27 @@ class BankDetailsAddForm(forms.ModelForm):
         fields = ['account', 'bank_name']
 
 
-class DeliveryAddForm(forms.ModelForm):
-    class Meta:
-        model = Document
-        fields = ['vendor', 'nomenclatures']
+class DeliveryAddForm(forms.Form):
+    vendor = forms.ModelChoiceField(
+        queryset=Vendor.objects.all()
+    )
+
+    # nomenclatures = forms.ModelMultipleChoiceField(
+    #    queryset=Nomenclature.objects.all(),
+    #    widget=forms.CheckboxSelectMultiple()
+    # )
+
+
+class DocumentNomenclaturesAddForm(forms.Form):
+    nomenclature = forms.ModelChoiceField(
+        queryset=Nomenclature.objects.all(),
+    )
+    amount = forms.IntegerField(initial=1, min_value=1)
+
+
+DocumentNomenclaturesFormSet = formset_factory(
+    DocumentNomenclaturesAddForm
+)
 
 
 class ShipmentAddForm(forms.ModelForm):

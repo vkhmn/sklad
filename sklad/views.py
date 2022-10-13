@@ -1,3 +1,4 @@
+from django.core.exceptions import ValidationError
 from django.contrib.auth import logout
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView, LogoutView
@@ -11,6 +12,11 @@ from sklad.mixin import DataMixin, SuperUserRequiredMixin
 from sklad.forms import *
 from sklad.tasks import send_email_to_buyer
 from sklad.utils import decode, make_qrcode
+
+
+# TODO:
+# Fix dublicate Nomenclature items in documents
+# Fix create null document - Done
 
 
 class IndexView(LoginRequiredMixin, DataMixin, ListView):
@@ -322,6 +328,56 @@ class VendorAddView(SuperUserRequiredMixin, DataMixin, TemplateView):
         return redirect(self.success_url)
 
 
+class DeliveryAddView(SuperUserRequiredMixin, DataMixin, TemplateView):
+    """"Веб сервис для создания заявки на поставку. """
+
+    template_name = 'sklad/delivery_add.html'
+    success_url = reverse_lazy('delivery_list')
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        c_def = self.get_user_context(title='Создание заяки на поставку')
+        context['delivery_form'] = DeliveryAddForm()
+        context['document_nomenclature_form_set'] = DocumentNomenclaturesFormSet()
+        return dict(list(context.items()) + list(c_def.items()))
+
+    def post(self, request, *args, **kwargs):
+        delivery_form = DeliveryAddForm(request.POST)
+        document_nomenclature_form_set = DocumentNomenclaturesFormSet(
+            data=request.POST
+        )
+        if delivery_form.is_valid() or document_nomenclature_form_set.is_valid():
+            print(delivery_form.is_valid())
+            vendor = delivery_form.cleaned_data.get('vendor')
+            document = Document(vendor=vendor)
+
+            # Generate valid nomenclatures list
+            nomenclatures = []
+            for form in document_nomenclature_form_set:
+                print(form.is_valid())
+                try:
+                    nomenclature = DocumentNomenclatures(
+                        **form.cleaned_data,
+                        document=document
+                    )
+                    nomenclature.full_clean(exclude=['document'])
+                    nomenclatures.append(nomenclature)
+                except ValidationError:
+                    print('Error')
+
+            if nomenclatures:
+                document.save()
+                [nomenclature.save() for nomenclature in nomenclatures]
+            else:
+                delivery_form.add_error(None, 'Укажите корректные данные для номенклатуры')
+                context = self.get_context_data(*args, **kwargs)
+                context['delivery_form'] = delivery_form
+                context['document_nomenclature_form_set'] = document_nomenclature_form_set
+                return self.render_to_response(context)
+
+        return redirect(self.success_url)
+
+
 class ShipmentAddView(SuperUserRequiredMixin, DataMixin, CreateView):
     """"Веб сервис для создания заявки на отгрузку. """
 
@@ -334,21 +390,6 @@ class ShipmentAddView(SuperUserRequiredMixin, DataMixin, CreateView):
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
         c_def = self.get_user_context(title='Создание заявки на отгрузку')
-        return dict(list(context.items()) + list(c_def.items()))
-
-
-class DeliveryAddView(SuperUserRequiredMixin, DataMixin, CreateView):
-    """"Веб сервис для создания заявки на поставку. """
-
-    form_class = DeliveryAddForm
-    template_name = 'sklad/delivery_add.html'
-    success_url = reverse_lazy('delivery_list')
-#    login_url = reverse_lazy('home')
-    raise_exception = True
-
-    def get_context_data(self, *, object_list=None, **kwargs):
-        context = super().get_context_data(**kwargs)
-        c_def = self.get_user_context(title='Создание заяки на поставку')
         return dict(list(context.items()) + list(c_def.items()))
 
 
@@ -458,6 +499,8 @@ class UpdateStatusDocumentView(DocumentView):
                     )
         return redirect(reverse('document', args={document_id: document_id}))
 
+
+# For Ajax TEST
 
 from django.http import JsonResponse
 
