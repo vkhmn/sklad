@@ -15,7 +15,7 @@ from sklad.utils import decode, make_qrcode
 
 
 # TODO:
-# Fix dublicate Nomenclature items in documents
+# Fix dublicate Nomenclature items in documents - Done
 # Fix create null document - Done
 
 
@@ -367,7 +367,16 @@ class DeliveryAddView(SuperUserRequiredMixin, DataMixin, TemplateView):
 
             if nomenclatures:
                 document.save()
-                [nomenclature.save() for nomenclature in nomenclatures]
+
+                # Merge dublicate nomenclature item
+                nomenclatures_dict = dict()
+                for n in nomenclatures:
+                    if n.nomenclature in nomenclatures_dict:
+                        nomenclatures_dict[n.nomenclature].amount += n.amount
+                    else:
+                        nomenclatures_dict[n.nomenclature] = n
+
+                [nomenclature.save() for nomenclature in nomenclatures_dict.values()]
             else:
                 delivery_form.add_error(None, 'Укажите корректные данные для номенклатуры')
                 context = self.get_context_data(*args, **kwargs)
@@ -478,11 +487,9 @@ class UpdateStatusDocumentView(DocumentView):
         if self.object.vendor is not None:
             if status in (Status.FINISHED, ):
                 # Add nomenclatures amount to Store
-                for item in self.object.nomenclatures.all():
-                    Store.objects.filter(nomenclature=item).update(
-                        amount=F('amount') + DocumentNomenclatures.objects.get(
-                            nomenclature=item, document=self.object
-                        ).amount
+                for item in DocumentNomenclatures.objects.filter(document=self.object):
+                    Store.objects.filter(nomenclature=item.nomenclature).update(
+                        amount=F('amount') + item.amount
                     )
 
         if self.object.buyer is not None:
@@ -491,11 +498,9 @@ class UpdateStatusDocumentView(DocumentView):
 
             if status in (Status.COLLECTED):
                 # Sub nomenclatures amount to Store (Reserve)
-                for item in self.object.nomenclatures.all():
-                    Store.objects.filter(nomenclature=item).update(
-                        amount=F('amount') - DocumentNomenclatures.objects.get(
-                            nomenclature=item, document=self.object
-                        ).amount
+                for item in DocumentNomenclatures.objects.filter(document=self.object):
+                    Store.objects.filter(nomenclature=item.nomenclature).update(
+                        amount=F('amount') - item.amount
                     )
         return redirect(reverse('document', args={document_id: document_id}))
 
