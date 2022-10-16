@@ -1,7 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import AuthenticationForm
-from django.db.models import Subquery
-from django.forms import modelformset_factory, formset_factory
+from django.forms import formset_factory
 
 from sklad.models import *
 
@@ -48,6 +47,14 @@ class DeliveryAddForm(forms.Form):
     # )
 
 
+class ShipmentAddForm(forms.Form):
+    buyer = forms.ModelChoiceField(
+        queryset=Buyer.objects.all(),
+        label='Покупатель'
+
+    )
+
+
 class DocumentNomenclaturesAddForm(forms.Form):
     nomenclature = forms.ModelChoiceField(
         queryset=Nomenclature.objects.all(),
@@ -63,12 +70,6 @@ class DocumentNomenclaturesAddForm(forms.Form):
 DocumentNomenclaturesFormSet = formset_factory(
     DocumentNomenclaturesAddForm
 )
-
-
-class ShipmentAddForm(forms.ModelForm):
-    class Meta:
-        model = Document
-        fields = ['buyer', 'nomenclatures']
 
 
 class LoginUserForm(AuthenticationForm):

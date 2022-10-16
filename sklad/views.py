@@ -15,6 +15,7 @@ from sklad.utils import decode, make_qrcode
 
 
 # TODO:
+# Fix dublicate code in (shipment_add, delivery_add) Views
 # Fix dublicate Nomenclature items in documents - Done
 # Fix create null document - Done
 
@@ -387,19 +388,63 @@ class DeliveryAddView(SuperUserRequiredMixin, DataMixin, TemplateView):
         return redirect(self.success_url)
 
 
-class ShipmentAddView(SuperUserRequiredMixin, DataMixin, CreateView):
+class ShipmentAddView(SuperUserRequiredMixin, DataMixin, TemplateView):
     """"Веб сервис для создания заявки на отгрузку. """
 
-    form_class = ShipmentAddForm
-    template_name = 'sklad/shipment_add.html'
+    template_name = 'sklad/delivery_add.html'
     success_url = reverse_lazy('shipment_list')
-#    login_url = reverse_lazy('home')
-    raise_exception = True
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
         c_def = self.get_user_context(title='Создание заявки на отгрузку')
+        context['delivery_form'] = ShipmentAddForm()
+        context['document_nomenclature_form_set'] = DocumentNomenclaturesFormSet()
         return dict(list(context.items()) + list(c_def.items()))
+
+    def post(self, request, *args, **kwargs):
+        shipment_form = ShipmentAddForm(request.POST)
+        document_nomenclature_form_set = DocumentNomenclaturesFormSet(
+            data=request.POST
+        )
+        if shipment_form.is_valid() or document_nomenclature_form_set.is_valid():
+            print(shipment_form.is_valid())
+            buyer = shipment_form.cleaned_data.get('buyer')
+            document = Document(buyer=buyer)
+
+            # Generate valid nomenclatures list
+            nomenclatures = []
+            for form in document_nomenclature_form_set:
+                print(form.is_valid())
+                try:
+                    nomenclature = DocumentNomenclatures(
+                        **form.cleaned_data,
+                        document=document
+                    )
+                    nomenclature.full_clean(exclude=['document'])
+                    nomenclatures.append(nomenclature)
+                except ValidationError:
+                    print('Error')
+
+            if nomenclatures:
+                document.save()
+
+                # Merge dublicate nomenclature item
+                nomenclatures_dict = dict()
+                for n in nomenclatures:
+                    if n.nomenclature in nomenclatures_dict:
+                        nomenclatures_dict[n.nomenclature].amount += n.amount
+                    else:
+                        nomenclatures_dict[n.nomenclature] = n
+
+                [nomenclature.save() for nomenclature in nomenclatures_dict.values()]
+            else:
+                shipment_form.add_error(None, 'Укажите корректные данные для номенклатуры')
+                context = self.get_context_data(*args, **kwargs)
+                context['delivery_form'] = shipment_form
+                context['document_nomenclature_form_set'] = document_nomenclature_form_set
+                return self.render_to_response(context)
+
+        return redirect(self.success_url)
 
 
 class LoginUser(DataMixin, LoginView):
