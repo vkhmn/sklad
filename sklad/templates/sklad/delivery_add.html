@@ -11,12 +11,16 @@
         {% endfor %}
         {{ document_nomenclature_form_set.management_form }}
         {% for form in document_nomenclature_form_set %}
-        <div class="bird-form">
-        {{ form.as_p }}
-        </div>
+            <div class="bird-form">
+                <p>
+                {% for f in form %}
+                    <label class="form-label" for="{{ f.id_for_label }}">{{ f.label }}:</label>{{ f }}
+                {% endfor %}
+                </p>
+            </div>
         {% endfor %}
-        <button id="add-form" type="button">Add Nomenclature</button>
-        <button type="submit">Добавить</button>
+        <button id="add-form" type="button">Добавить номенклатуру</button>
+        <button type="submit">Создать заявку</button>
     </form>
 
         <script>

@@ -37,7 +37,9 @@ class BankDetailsAddForm(forms.ModelForm):
 
 class DeliveryAddForm(forms.Form):
     vendor = forms.ModelChoiceField(
-        queryset=Vendor.objects.all()
+        queryset=Vendor.objects.all(),
+        label='Поставщик'
+
     )
 
     # nomenclatures = forms.ModelMultipleChoiceField(
@@ -49,8 +51,13 @@ class DeliveryAddForm(forms.Form):
 class DocumentNomenclaturesAddForm(forms.Form):
     nomenclature = forms.ModelChoiceField(
         queryset=Nomenclature.objects.all(),
+        label='Номенклатура'
     )
-    amount = forms.IntegerField(initial=1, min_value=1)
+    amount = forms.IntegerField(
+        initial=1,
+        min_value=1,
+        label='Количество'
+    )
 
 
 DocumentNomenclaturesFormSet = formset_factory(
