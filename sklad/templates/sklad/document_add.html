@@ -1,0 +1,62 @@
+{% extends 'sklad/base.html' %}
+
+{% block content %}
+    <h3>{{ title }}</h3>
+    <br><br>
+    <form id="form-container" method="post">
+        {% csrf_token %}
+        <div class="form-group row">
+            <label class="col-lg-2 col-form-label form-control-label text-muted" for="{{ document_add_form.contactor.id_for_label }}">
+                {{ document_add_form.contactor.label }}
+            </label>
+            <div class="col-lg-2">{{ document_add_form.contactor }}</div>
+        </div>
+
+        <div class="text-danger">
+            {{ document_add_form.non_field_errors }}
+        </div>
+
+        {{ document_nomenclature_form_set.management_form }}
+        {% for form in document_nomenclature_form_set %}
+            <div class="nomenclature-form">
+                <div class="form-group row">
+	                <label class="col-md-2 col-form-label form-control-label text-muted">{{ form.nomenclature.label }}</label>
+	                <div class="col-lg-2">
+		                {{ form.nomenclature }}
+	                </div>
+                    <div class="col-md-1">
+		                {{ form.amount }}
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+
+        <button id="add-form" type="button" class="btn btn-secondary">Добавить номенклатуру</button>
+        <button type="submit"  class="btn btn-success">Создать заявку</button>
+    </form>
+
+
+    <script>
+        let nomenclatureForm = document.querySelectorAll(".nomenclature-form")
+        let container = document.querySelector("#form-container")
+        let addButton = document.querySelector("#add-form")
+        let totalForms = document.querySelector("#id_form-TOTAL_FORMS")
+
+        let formNum = nomenclatureForm.length-1
+        addButton.addEventListener('click', addForm)
+
+        function addForm(e){
+            e.preventDefault()
+
+            let newForm = nomenclatureForm[0].cloneNode(true)
+            let formRegex = RegExp(`form-(\\d){1}-`,'g')
+
+            formNum++
+            newForm.innerHTML = newForm.innerHTML.replace(formRegex, `form-${formNum}-`)
+            container.insertBefore(newForm, addButton)
+
+            totalForms.setAttribute('value', `${formNum+1}`)
+        }
+    </script>
+
+{% endblock %}
