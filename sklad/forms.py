@@ -8,62 +8,85 @@ from sklad.models import *
 class NomenklatureAddForm(forms.ModelForm):
     class Meta:
         model = Nomenclature
-        fields = '__all__'
+        fields = ['name', 'article', 'price', 'subcategory']
+        widgets = {
+            'name': forms.TextInput(attrs={'class': 'form-control'}),
+            'article': forms.TextInput(attrs={'class': 'form-control'}),
+            'price': forms.NumberInput(attrs={'class': 'form-control'}),
+            'subcategory': forms.Select(attrs={'class': 'form-control'}),
+        }
 
 
 class BuyerAddForm(forms.ModelForm):
     class Meta:
         model = Buyer
-        fields = '__all__'
+        fields = ['fio', 'email', 'phone']
+        widgets = {
+            'fio': forms.TextInput(attrs={'class': 'form-control'}),
+            'email': forms.EmailInput(attrs={'class': 'form-control'}),
+            'phone': forms.NumberInput(attrs={'class': 'form-control'}),
+        }
 
 
 class VendorAddForm(forms.ModelForm):
     class Meta:
         model = Vendor
         fields = ['name', 'address', 'fio', 'email', 'phone', 'categories']
-
-#    def __init__(self, *args, **kwargs):
-#        super().__init__(*args, **kwargs)
-#        self.fields['bank_details'].queryset = BankDetails.objects.exclude(
-#            pk__in=Subquery(Vendor.objects.values('bank_details')))
+        widgets = {
+            'name': forms.TextInput(attrs={'class': 'form-control'}),
+            'address': forms.TextInput(attrs={'class': 'form-control'}),
+            'fio': forms.TextInput(attrs={'class': 'form-control'}),
+            'email': forms.EmailInput(attrs={'class': 'form-control'}),
+            'phone': forms.NumberInput(attrs={'class': 'form-control'}),
+            'categories': forms.SelectMultiple(attrs={'class': 'form-control'}),
+        }
 
 
 class BankDetailsAddForm(forms.ModelForm):
     class Meta:
         model = BankDetails
         fields = ['account', 'bank_name']
+        widgets = {
+            'bank_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'account': forms.NumberInput(attrs={'class': 'form-control'}),
+        }
 
 
 class DeliveryAddForm(forms.Form):
-    vendor = forms.ModelChoiceField(
+    contactor = forms.ModelChoiceField(
         queryset=Vendor.objects.all(),
-        label='Поставщик'
-
+        label='Поставщик',
+        widget=forms.Select(
+            attrs={'class': 'form-control'}
+        )
     )
-
-    # nomenclatures = forms.ModelMultipleChoiceField(
-    #    queryset=Nomenclature.objects.all(),
-    #    widget=forms.CheckboxSelectMultiple()
-    # )
 
 
 class ShipmentAddForm(forms.Form):
-    buyer = forms.ModelChoiceField(
+    contactor = forms.ModelChoiceField(
         queryset=Buyer.objects.all(),
-        label='Покупатель'
-
+        label='Покупатель',
+        widget=forms.Select(
+            attrs={'class': 'form-control'}
+        )
     )
 
 
 class DocumentNomenclaturesAddForm(forms.Form):
     nomenclature = forms.ModelChoiceField(
         queryset=Nomenclature.objects.all(),
-        label='Номенклатура'
+        label='Номенклатура',
+        widget=forms.Select(
+            attrs={'class': 'form-control'}
+        )
     )
     amount = forms.IntegerField(
         initial=1,
         min_value=1,
-        label='Количество'
+        label='Количество',
+        widget=forms.NumberInput(
+            attrs={'class': 'form-control'}
+        )
     )
 
 
@@ -73,5 +96,15 @@ DocumentNomenclaturesFormSet = formset_factory(
 
 
 class LoginUserForm(AuthenticationForm):
-    username = forms.CharField(label='Логин', widget=forms.TextInput(attrs={'class': 'form-input'}))
-    password = forms.CharField(label='Пароль', widget=forms.PasswordInput(attrs={'class': 'form-input'}))
+    username = forms.CharField(
+        label='Логин',
+        widget=forms.TextInput(
+            attrs={'class': 'form-input'}
+        )
+    )
+    password = forms.CharField(
+        label='Пароль',
+        widget=forms.PasswordInput(
+            attrs={'class': 'form-input'}
+        )
+    )

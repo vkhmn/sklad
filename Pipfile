@@ -9,6 +9,7 @@ celery = "*"
 redis = "*"
 qrcode = "*"
 pillow = "*"
+django-bootstrap4 = "*"
 
 [dev-packages]
 

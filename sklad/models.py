@@ -43,7 +43,7 @@ class Nomenclature(models.Model):
     """ Номенклатура """
 
     name = models.CharField('Наименование', max_length=100)
-    article = models.IntegerField('Артукул', unique=True)
+    article = models.IntegerField('Артикул', unique=True)
     price = models.IntegerField('Цена')
     subcategory = models.ForeignKey(
         SubCategory,
@@ -92,6 +92,8 @@ class Contactor(models.Model):
 
 
 class Buyer(Contactor):
+    """ Покупатель """
+
     def __str__(self):
         return self.fio
 
@@ -187,6 +189,13 @@ class Document(models.Model):
     def get_absolute_url(self):
         return reverse('document', kwargs={'pk': self.pk})
 
+    def __str__(self):
+        document_type = 'Поставка' if self.vendor else 'Отгрузка'
+        if not (self.buyer or self.vendor):
+            document_type = 'None'
+
+        return f'{document_type} № {self.pk}'
+
 
 class DocumentNomenclatures(models.Model):
     """ Хранит номенклатуру и кол-во в документе """
@@ -202,3 +211,6 @@ class DocumentNomenclatures(models.Model):
         verbose_name='Заявка'
     )
     amount = models.IntegerField('Количество', default=1)
+
+    def __str__(self):
+        return f'{self.nomenclature}  - ({self.amount} шт.)'

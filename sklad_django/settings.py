@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'sklad.apps.SkladConfig',
+    'bootstrap4',
 ]
 
 MIDDLEWARE = [

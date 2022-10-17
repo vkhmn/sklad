@@ -296,7 +296,6 @@ class BuyerAddView(SuperUserRequiredMixin, DataMixin, CreateView):
         context['left_menu'] = [
             {'url_name': 'buyer_add', 'title': 'Создать покупателя'}
         ]
-        context['url_name'] = 'buyer_add'
         return dict(list(context.items()) + list(c_def.items()))
 
 
@@ -312,7 +311,6 @@ class VendorAddView(SuperUserRequiredMixin, DataMixin, TemplateView):
         context['left_menu'] = [
             {'url_name': 'vendor_add', 'title': 'Создать поставщика'}
         ]
-        context['url_name'] = 'vendor_add'
         context['bank_details_form'] = BankDetailsAddForm()
         context['vendor_form'] = VendorAddForm()
         return dict(list(context.items()) + list(c_def.items()))
@@ -332,25 +330,26 @@ class VendorAddView(SuperUserRequiredMixin, DataMixin, TemplateView):
 class DeliveryAddView(SuperUserRequiredMixin, DataMixin, TemplateView):
     """"Веб сервис для создания заявки на поставку. """
 
-    template_name = 'sklad/delivery_add.html'
+    template_name = 'sklad/document_add.html'
     success_url = reverse_lazy('delivery_list')
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
         c_def = self.get_user_context(title='Создание заяки на поставку')
-        context['delivery_form'] = DeliveryAddForm()
+        context['document_add_form'] = DeliveryAddForm()
         context['document_nomenclature_form_set'] = DocumentNomenclaturesFormSet()
         return dict(list(context.items()) + list(c_def.items()))
 
     def post(self, request, *args, **kwargs):
-        delivery_form = DeliveryAddForm(request.POST)
+        document_add_form = DeliveryAddForm(request.POST)
         document_nomenclature_form_set = DocumentNomenclaturesFormSet(
             data=request.POST
         )
-        if delivery_form.is_valid() or document_nomenclature_form_set.is_valid():
-            print(delivery_form.is_valid())
-            vendor = delivery_form.cleaned_data.get('vendor')
-            document = Document(vendor=vendor)
+        if document_add_form.is_valid() or document_nomenclature_form_set.is_valid():
+            print(document_add_form.is_valid())
+            document = Document(
+                vendor=document_add_form.cleaned_data.get('contactor')
+            )
 
             # Generate valid nomenclatures list
             nomenclatures = []
@@ -379,9 +378,12 @@ class DeliveryAddView(SuperUserRequiredMixin, DataMixin, TemplateView):
 
                 [nomenclature.save() for nomenclature in nomenclatures_dict.values()]
             else:
-                delivery_form.add_error(None, 'Укажите корректные данные для номенклатуры')
+                document_add_form.add_error(
+                    None,
+                    'Укажите корректные данные для номенклатуры'
+                )
                 context = self.get_context_data(*args, **kwargs)
-                context['delivery_form'] = delivery_form
+                context['document_add_form'] = document_add_form
                 context['document_nomenclature_form_set'] = document_nomenclature_form_set
                 return self.render_to_response(context)
 
@@ -391,25 +393,26 @@ class DeliveryAddView(SuperUserRequiredMixin, DataMixin, TemplateView):
 class ShipmentAddView(SuperUserRequiredMixin, DataMixin, TemplateView):
     """"Веб сервис для создания заявки на отгрузку. """
 
-    template_name = 'sklad/delivery_add.html'
+    template_name = 'sklad/document_add.html'
     success_url = reverse_lazy('shipment_list')
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
         c_def = self.get_user_context(title='Создание заявки на отгрузку')
-        context['delivery_form'] = ShipmentAddForm()
+        context['document_add_form'] = ShipmentAddForm()
         context['document_nomenclature_form_set'] = DocumentNomenclaturesFormSet()
         return dict(list(context.items()) + list(c_def.items()))
 
     def post(self, request, *args, **kwargs):
-        shipment_form = ShipmentAddForm(request.POST)
+        document_add_form = ShipmentAddForm(request.POST)
         document_nomenclature_form_set = DocumentNomenclaturesFormSet(
             data=request.POST
         )
-        if shipment_form.is_valid() or document_nomenclature_form_set.is_valid():
-            print(shipment_form.is_valid())
-            buyer = shipment_form.cleaned_data.get('buyer')
-            document = Document(buyer=buyer)
+        if document_add_form.is_valid() or document_nomenclature_form_set.is_valid():
+            print(document_add_form.is_valid())
+            document = Document(
+                buyer=document_add_form.cleaned_data.get('contactor')
+            )
 
             # Generate valid nomenclatures list
             nomenclatures = []
@@ -438,9 +441,12 @@ class ShipmentAddView(SuperUserRequiredMixin, DataMixin, TemplateView):
 
                 [nomenclature.save() for nomenclature in nomenclatures_dict.values()]
             else:
-                shipment_form.add_error(None, 'Укажите корректные данные для номенклатуры')
+                document_add_form.add_error(
+                    None,
+                    'Укажите корректные данные для номенклатуры'
+                )
                 context = self.get_context_data(*args, **kwargs)
-                context['delivery_form'] = shipment_form
+                context['document_add_form'] = document_add_form
                 context['document_nomenclature_form_set'] = document_nomenclature_form_set
                 return self.render_to_response(context)
 
