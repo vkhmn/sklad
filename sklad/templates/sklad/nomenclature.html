@@ -1,9 +1,19 @@
 {% extends 'sklad/base.html' %}
 
 {% block content %}
-    <p>Категория/Подкатегория: {{ nomenclature.subcategory.category }} / {{ nomenclature.subcategory }} </p>
-    <p>Стоимость товара в категории: {{ total_category }}</p>
-    <p>Подкатегории:
+        <h3>Сведения о номенклатуре</h3><br><br>
+
+        <div class="form-group row">
+            <div class="col-md-3 col-form-label form-control-label text-muted">Категория/Подкатегория</div>
+            <div class="col-md-3 col-form-label form-control-label" >{{ nomenclature.subcategory.category }} / {{ nomenclature.subcategory }}</div>
+        </div>
+         <div class="form-group row">
+            <div class="col-md-3 col-form-label form-control-label text-muted">Стоимость товара в категории </div>
+            <div class="col-md-3 col-form-label form-control-label" >{{ total_category }} р.</div>
+        </div>
+            <div class="form-group row">
+            <div class="col-md-3 col-form-label form-control-label text-muted">Подкатегории товаров</div>
+            <div class="col-md-3 col-form-label form-control-label" >
         {% for subcategory in subcategories %}
             {% if forloop.last %}
                 {{ subcategory }}
@@ -11,9 +21,22 @@
                 {{ subcategory }},
             {% endif %}
         {% endfor %}
-    </p>
-    <p>Наименование товара: {{nomenclature.name}}</p>
-    <p>Артикул товара: {{nomenclature.article}}</p>
-    <p>Количество товара на складе: {{store.amount}}</p>
-    <p>Стоимость: {{nomenclature.price}}</p>
+            </div>
+        </div>
+        <div class="form-group row">
+            <div class="col-md-3 col-form-label form-control-label text-muted">Наименование товара</div>
+            <div class="col-md-3 col-form-label form-control-label">{{ nomenclature.name }}</div>
+        </div>
+         <div class="form-group row">
+            <div class="col-md-3 col-form-label form-control-label text-muted">Артикул товара</div>
+            <div class="col-md-3 col-form-label form-control-label">{{ nomenclature.article }}</div>
+        </div>
+         <div class="form-group row">
+            <div class="col-md-3 col-form-label form-control-label text-muted">Цена</div>
+            <div class="col-md-3 col-form-label form-control-label">{{ nomenclature.price }} р.</div>
+        </div>
+         <div class="form-group row">
+            <div class="col-md-3 col-form-label form-control-label text-muted">Стоимость товара в категории </div>
+            <div class="col-md-3 col-form-label form-control-label" >{{ total_category }} р.</div>
+        </div>
 {% endblock %}
