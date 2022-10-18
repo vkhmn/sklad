@@ -1,23 +1,75 @@
-<h1>Заявка на отгрузку</h1>
-<p>Номер заявки: {{document.pk}}</p>
-<p>Дата: {{document.time_create}}</p>
-<p>Покупатель: {{document.buyer}}</p>
-<p>Список товаров: </p>
-{% for item in result %}
-    {% if item.store_amount < item.amount and document.status == 'va'%}
-        <p> {{ item.name }} {{ item.price }} р. {{ item.amount }} шт. (В наличии {{ item.store_amount }} шт.) {{ item.total }} р. </p>
-    {% else %}
-        <p> {{ item.name }} {{ item.price }} р. {{ item.amount }} шт. {{ item.total }} р. </p>
-    {% endif %}
-{% endfor %}
--------
-<p>Цена: {{total.sum}} р.</p>
-<p>Статус: {{document.get_status_display}}</p>
+<h3>Заявка на отгрузку</h3>
+<br><br>
+       <div class="form-group row">
+            <div class="col-md-3 col-form-label form-control-label text-muted">Номер заявки</div>
+            <div class="col-md-3 col-form-label form-control-label" >{{ document.pk }}</div>
+        </div>
+       <div class="form-group row">
+            <div class="col-md-3 col-form-label form-control-label text-muted">Дата</div>
+            <div class="col-md-3 col-form-label form-control-label" >{{ document.time_create }}</div>
+        </div>
+       <div class="form-group row">
+            <div class="col-md-3 col-form-label form-control-label text-muted">Покупатель</div>
+            <div class="col-md-3 col-form-label form-control-label" >{{ document.buyer }}</div>
+        </div>
+<table class="table">
+    <thead>
+    <tr class="table-secondary">
+        <th scope="col">#</th>
+        <th scope="col">Наименование</th>
+        <th scope="col">Цена</th>
+        <th scope="col">Количество</th>
+        <th scope="col">Стоимость</th>
+    </tr>
+    </thead>
+    {% for item in result  %}
+        <tbody>
+        {% if item.store_amount < item.amount and document.status == 'va'%}
+            <tr class="table-danger">
+        {% else %}
+            <tr>
+        {% endif %}
+        <th scope="row"></th>
+        <td><a href="{{ item.get_absoaqwselute_url }}"> {{ item.name }} </a></td>
+        <td>{{ item.price }} р.</td>
+        <td>{{ item.amount }}</td>
+        <td>{{ item.total }} р.</td>
+        </tr>
+        </tbody>
+    {% endfor %}
+    <tfoot>
+    <tr class="table-secondary">
+        <th scope="col"></th>
+        <th scope="col">Итого:</th>
+        <th scope="col"></th>
+        <th scope="col"></th>
+        <th scope="col">{{ total.sum }} р.</th>
+    </tr>
+    </tfoot>
+</table>
+
+        <div class="form-group row">
+            <div class="col-md-3 col-form-label form-control-label text-muted">Статус</div>
+            <div class="col-md-3 col-form-label form-control-label">
+                {% if document.status == 'ca' %}
+                    <div class="text-danger">
+                {% elif document.status == 'fi' %}
+                    <div class="text-success">
+                {% elif document.status == 'co'%}
+                    <div class="text-warning">
+                {% else %}
+                    <div>
+                {% endif %}
+                {{ document.get_status_display }}
+                </div>
+            </div>
+        </div>
+
 {% if document.status in 'co,fi' %}
     <p><img src="data:image/png;base64,{{ qrcode }}" width="100" height="100"/></p>
 {% endif %}
 {% if document.status == 'va' %}
-    -------
+    -------<p></p>
     <p><a href={% url 'document_change_status' document.pk 'ca' %}>Отказать в выполнении заказа</a></p>
     {% if total.min >= 0 %}
         <p><a href={% url 'document_change_status' document.pk 'co' %}>Заказ собран</a></p>

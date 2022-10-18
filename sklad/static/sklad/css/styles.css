@@ -1,5 +1,4 @@
 html, body {
-	font-family: 'Arial';
 	margin: 0;
 	padding: 0;
 	height: 100%;
@@ -219,6 +218,7 @@ ul.breadcrumbs {
 ul.breadcrumbs li {
 	display: inline-block;
 }
+
 ul.breadcrumbs li a {
 	color: #0059b2;
 	text-decoration: none;
@@ -234,7 +234,6 @@ ul.control {
 	margin: 0;
 	padding: 60px 0 0 0;
 	list-style: none;
-	font-family: Sans-serif, Arial, Tahoma;
 	font-size: 18px;
 	width: 100%;
 }
@@ -249,7 +248,6 @@ ul.content-table {
 	margin: 0;
 	padding: 60px 0 0 30px;
 	list-style: none;
-	font-family: Sans-serif, Arial, Tahoma;
 	font-size: 28px;
 }
 ul.content-table li {
@@ -265,7 +263,6 @@ ul.content-table li a:hover {color: #F0711C;}
 	margin: 60px 0 0 30px;
 	color: #000;
 	font-size: 20px;
-	font-family: Yandex Sans Display Light;
 }
 .content-text h1 {font-size: 32px;}
 
@@ -367,28 +364,6 @@ ul.lang-list li a:hover {color: #fdc073;}
 #footer a {
 	text-decoration: underline;
 	color: #aaa;
-}
-
-.form-input {
-    width: 300px;
-    font-size: 16px;
-}
-
-.form-label {
-    display: inline-block;
-    min-width: 150px;
-    vertical-align: top;
-}
-
-.form-error ul {
-    list-style: none;
-    padding: 0;
-    color: #CC0000;
-}
-
-.form-button {
-    min-width: 200px;
-    font-size: 16px;
 }
 
 .list-pages {
