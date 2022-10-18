@@ -5,28 +5,44 @@
 {% endblock %}
 
 {% block content %}
-<h1>{{ title }}</h1>
-<ul class="list-articles">
+<h3>{{ title }}</h3><br><br>
     {% if buyers %}
-	{% for n in buyers %}
-        <li>
-            <div class="article-panel">
-                <p class="first"><a href="{{ n.get_absolute_url }}">{{ n.fio }}</a> {{ n.email }}</p>
-                <p class="last"></p>
-            </div>
-			<div class="clear"></div>
-        </li>
-	{% endfor %}
+        <table class="table">
+        <thead>
+        <tr class="table-secondary">
+            <th scope="col">#</th>
+            <th scope="col">Фамилия Имя Отчество</th>
+            <th scope="col">Email</th>
+        </tr>
+        </thead>
+        {% for n in buyers %}
+            <tbody>
+                <tr>
+                    <td></td>
+                    <td><a href="{{ n.get_absolute_url }}">{{ n.fio }}</a></td>
+                    <td>{{ n.email }}</td>
+                </tr>
+            </tbody>
+	    {% endfor %}
+        </table>
     {% elif vendors %}
- 	{% for n in vendors %}
-        <li>
-            <div class="article-panel">
-                <p class="first"><a href="{{ n.get_absolute_url }}">{{ n.name }}</a> {{ n.email }}</p>
-                <p class="last"></p>
-            </div>
-			<div class="clear"></div>
-        </li>
-	{% endfor %}
+        <table class="table">
+            <thead>
+            <tr class="table-secondary">
+                <th scope="col">#</th>
+                <th scope="col">Наименование</th>
+                <th scope="col">Email</th>
+            </tr>
+            </thead>
+            {% for n in vendors %}
+                <tbody>
+                <tr>
+                    <td></td>
+                    <td><a href="{{ n.get_absolute_url }}">{{ n.name }}</a></td>
+                    <td>{{ n.email }}</td>
+                </tr>
+                </tbody>
+            {% endfor %}
+        </table>
     {% endif %}
-</ul>
 {% endblock %}

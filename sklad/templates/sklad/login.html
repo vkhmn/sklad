@@ -1,14 +1,21 @@
 {% extends 'sklad/base.html' %}
  
 {% block content %}
-<h1>{{title}}</h1>
-<form method="post">
-    {% csrf_token %}
-    <div class="form-error">{{ form.non_field_errors }}</div>
-    {% for f in form %}
-        <p><label class="form-label" for="{{ f.id_for_label }}">{{f.label}}: </label>{{ f }}</p>
-        <div class="form-error">{{ f.errors }}</div>
-    {% endfor %}
-    <button type="submit">Войти</button>
-</form>
+
+
+    <h3>{{ title }}</h3>
+    <br><br>
+    <form method="post">
+        {% csrf_token %}
+        <div class="text-danger">{{ form.non_field_errors }}</div>
+        {% for f in form %}
+            <div class="form-group row">
+                <label class="col-md-1 col-form-label form-control-label text-muted" for="{{ f.id_for_label }}">{{ f.label }}</label>
+                <div class="col-lg-4">{{ f }}</div>
+                <div class="form-error">{{ f.errors }}</div>
+            </div>
+        {% endfor %}
+        <button type="submit" class="btn btn-success">Войти</button>
+    </form>
+
 {% endblock %}

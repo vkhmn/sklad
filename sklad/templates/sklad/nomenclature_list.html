@@ -16,24 +16,39 @@
 {% endblock %}
 
 {% block content %}
-
-{% regroup nomenclatures by subcategory.category as categories %}
-<ul>
-{% for category in categories %}
-    <li>{{ category.grouper }}
-    <ul>
-        {% regroup category.list by subcategory as subcategories %}
-        {% for subcategory in subcategories %}
-            <li>{{ subcategory.grouper }}</li>
-            {% for nomenclature in subcategory.list %}
-                <div class="article-panel">
-                <p class="first"><a href="{{ nomenclature.get_absolute_url }}">{{ nomenclature.name }}</a>: {{ nomenclature.article }} / Остаток ({{ nomenclature.store_amount }}) </p>
-                </div>
+    <table class="table">
+    <thead>
+        <tr class="table-secondary">
+            <th scope="col">Категория</th>
+            <th scope="col">Подкатегория</th>
+            <th scope="col">Наименование</th>
+            <th scope="col">Артикул</th>
+            <th scope="col">Остаток</th>
+        </tr>
+    </thead>
+        {% regroup nomenclatures by subcategory.category as categories %}
+        {% for category in categories %}
+            <tbody>
+            {% regroup category.list by subcategory as subcategories %}
+            {% for subcategory in subcategories %}
+                {% for nomenclature in subcategory.list %}
+                    {% if nomenclature.store_amount > 5 %}
+                        <tr>
+                    {% elif nomenclature.store_amount %}
+                        <tr class="table-warning">
+                    {% else %}
+                        <tr class="table-danger">
+                    {% endif %}
+                        <td><a href="{{ category.grouper.get_absolute_url }}">{{ category.grouper }}</a></td>
+                        <td><a href="{{ subcategory.grouper.get_absolute_url }}">{{ subcategory.grouper }}</a></td>
+                        <td><a href="{{ nomenclature.get_absolute_url }}">{{ nomenclature.name }}</a></td>
+                        <td>{{ nomenclature.article }}</td>
+                        <td>{{ nomenclature.store_amount }}</td>
+                    </tr>
+                    </tbody>
+                {% endfor %}
             {% endfor %}
         {% endfor %}
-    </ul>
-    </li>
-{% endfor %}
-</ul>
 
+    </table>
 {% endblock %}

@@ -7,49 +7,6 @@
 {% block content %}
     <h3>{{ title }}</h3>
     <br><br>
-    {% if add_url %}
-        <a href={% url add_url %}><b>Создать заявку</b></a><br><br>
-    {% endif %}
+    {% include 'sklad/document_list.html' %}
 
-    <table class="table">
-
-        <thead>
-        <tr class="table-secondary">
-            <th scope="col">#</th>
-            <th scope="col">Тип</th>
-            <th scope="col">Номер</th>
-            <th scope="col">Контрагент</th>
-            <th scope="col">Статус</th>
-            <th scope="col">Дата</th>
-        </tr>
-        </thead>
-        {% for d in documents  %}
-            <tbody>
-                {% if d.status == 'fi' %}
-                    <tr class="table-success">
-                {% elif d.status == 'ca' %}
-                    <tr class="table-danger">
-                {% elif d.status == 'co' %}
-                    <tr class="table-warning">
-                {% elif d.status == 'va' %}
-                    <tr>
-                {% else %}
-                    <tr>
-                {% endif %}
-                    <th scope="row"></th>
-                    {% if d.buyer %}
-                        <td>Отгрузка</td>
-                        <td><a href="{{ d.get_absolute_url }}">{{ d.pk }}</a></td>
-                        <td>{{ d.buyer }}</td>
-                    {% elif d.vendor %}
-                        <td>Поставка</td>
-                        <td><a href="{{ d.get_absolute_url }}">{{ d.pk }}</a></td>
-                        <td>{{ d.vendor }}</td>
-                    {% endif %}
-                    <td>{{ d.get_status_display }}</td>
-                    <td>{{ d.time_create|date:"d-m-Y H:i:s" }}</td>
-                </tr>
-            </tbody>
-        {% endfor %}
-    </table>
 {% endblock %}

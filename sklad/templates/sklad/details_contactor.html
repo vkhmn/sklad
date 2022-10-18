@@ -7,9 +7,9 @@
 {% block content %}
     {% if buyer %}
         <h1>Сведения о покупателе</h1>
-        <p>ФИО: {{buyer.fio}}</p>
-        <p>Email: {{buyer.email}}</p>
-        <p>Телефон: {{buyer.phone}}</p>
+        <p>ФИО: {{ buyer.fio }}</p>
+        <p>Email: {{ buyer.email }}</p>
+        <p>Телефон: {{ buyer.phone }}</p>
      {% elif vendor %}
         <h1>Сведения о поставщике</h1>
         <p>Наименование: {{ vendor.name }}</p>
@@ -17,9 +17,9 @@
         <p>Реквизиты:
         (Банк: {{ vendor.bank_details.bank_name }},
         Счет: {{ vendor.bank_details.account }})</p>
-        <p>ФИО: {{vendor.fio}}</p>
-        <p>Email: {{vendor.email}}</p>
-        <p>Телефон: {{vendor.phone}}</p>
+        <p>ФИО: {{ vendor.fio }}</p>
+        <p>Email: {{ vendor.email }}</p>
+        <p>Телефон: {{ vendor.phone }}</p>
         <b>Категории товаров:</b>
         {% for cat in vendor.categories.all %}
             {% if forloop.last %}
@@ -30,18 +30,11 @@
         {% endfor %}
     {% endif %}
     <ul class="list-articles"><li> </li></ul>
-    <br>
+    <br><br>
     <h3>Последние заявки:</h3>
-    <ul class="list-articles">
-    {% for d in documents  %}
-        <li>
-        <div class="article-panel">
-            <p class="first"><a href="{{ d.get_absolute_url }}">Заявка № {{ d.pk }}</a>  Статус: {{ d.get_status_display }}</p>
-	        <p class="last">{{d.time_create|date:"d-m-Y H:i:s"}}</p>
-        </div>
-        </li>
-    {% empty %}
+    {% if documents  %}
+        {% include 'sklad/document_list.html' %}
+    {% else %}
         Заявок нет
-    {% endfor %}
-    </ul>
+    {% endif %}
 {% endblock %}
