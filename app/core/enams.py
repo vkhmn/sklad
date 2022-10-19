@@ -1,4 +1,4 @@
-from sklad.models import Status
+from app.document.models import Status
 
 
 messages = {

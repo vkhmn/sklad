@@ -1,7 +1,7 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
 
-from sklad.enams import menu
+from app.core.enams import menu
 
 
 class SuperUserRequiredMixin(LoginRequiredMixin):
