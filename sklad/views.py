@@ -37,10 +37,17 @@ class IndexView(LoginRequiredMixin, DataMixin, ListView):
         context['search_form'] = SearchForm(data=self.request.GET)
         return context
 
-    def get_queryset(self):
-        query = self.request.GET.get('search', '')
+    def get_query_search(self):
+        return self.request.GET.get('search', '')
+
+    def get_status(self):
         status = self.request.GET.get('status')
         status = (status, ) if status else Status
+        return status
+
+    def get_queryset(self):
+        query = self.get_query_search()
+        status = self.get_status()
         return Document.objects.filter(
             Q(vendor__name__icontains=query) | Q(buyer__fio__icontains=query)
         ).filter(status__in=status).order_by('-time_create')
@@ -56,9 +63,8 @@ class DeliveryListView(SuperUserRequiredMixin, IndexView):
     }
 
     def get_queryset(self):
-        query = self.request.GET.get('search', '')
-        status = self.request.GET.get('status')
-        status = (status, ) if status else Status
+        query = self.get_query_search()
+        status = self.get_status()
         return Document.objects.filter(
             vendor__isnull=False).filter(
             vendor__name__icontains=query).filter(
@@ -75,9 +81,8 @@ class ShipmentListView(SuperUserRequiredMixin, IndexView):
     }
 
     def get_queryset(self):
-        query = self.request.GET.get('search', '')
-        status = self.request.GET.get('status')
-        status = (status, ) if status else Status
+        query = self.get_query_search()
+        status = self.get_status()
         return Document.objects.filter(
             buyer__isnull=False).filter(
             buyer__fio__icontains=query).filter(
