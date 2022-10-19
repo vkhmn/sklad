@@ -106,7 +106,7 @@ class NomenclatureListView(SuperUserRequiredMixin, DataMixin, ListView):
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
-        c_def = self.get_user_context(title="Главная страница")
+        c_def = self.get_user_context(title="Номенклатура")
         context = dict(list(context.items()) + list(c_def.items()))
         context['subcats'] = SubCategory.objects.annotate(total=Count(
             'nomenclature')
@@ -158,21 +158,28 @@ class VendorListView(SuperUserRequiredMixin, DataMixin, ListView):
         return context
 
 
-class CategoryView(SuperUserRequiredMixin, DataMixin, ListView):
-    """"Веб сервис для работы с номенклатурой
-    (отображение, фильтрация) в зависимости от выбранной категории."""
-
+class CategoryBase(SuperUserRequiredMixin, DataMixin, ListView):
     model = Nomenclature
     template_name = 'sklad/nomenclature_list.html'
     context_object_name = 'nomenclatures'
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
-        c_def = self.get_user_context(title="")
+        c_def = self.get_user_context()
         context = dict(list(context.items()) + list(c_def.items()))
         context['subcats'] = SubCategory.objects.annotate(total=Count(
             'nomenclature')
         ).filter(total__gt=0).order_by('category__name', 'name')
+        return context
+
+
+class CategoryView(CategoryBase):
+    """"Веб сервис для работы с номенклатурой
+    (отображение, фильтрация) в зависимости от выбранной категории."""
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = Category.objects.get(pk=self.kwargs['pk']).name
         return context
 
     def get_queryset(self):
@@ -184,9 +191,14 @@ class CategoryView(SuperUserRequiredMixin, DataMixin, ListView):
         )
 
 
-class SubCategoryView(CategoryView, ListView):
+class SubCategoryView(CategoryBase):
     """"Веб сервис для работы с номенклатурой
       (отображение, фильтрация) в зависимости от выбранной подкатегории."""
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = SubCategory.objects.get(pk=self.kwargs['pk']).name
+        return context
 
     def get_queryset(self):
         return Nomenclature.objects.filter(
