@@ -28,15 +28,22 @@ class IndexView(LoginRequiredMixin, DataMixin, ListView):
     template_name = 'sklad/index.html'
     context_object_name = 'documents'
     extra_context = {'title': 'Заявки на поставку/отгрузку'}
-    ordering = ['-time_create']
     login_url = reverse_lazy('login')
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
         c_def = self.get_user_context()
         context = dict(list(context.items()) + list(c_def.items()))
-        context['search_form'] = SearchForm()
+        context['search_form'] = SearchForm(data=self.request.GET)
         return context
+
+    def get_queryset(self):
+        query = self.request.GET.get('search', '')
+        status = self.request.GET.get('status')
+        status = (status, ) if status else Status
+        return Document.objects.filter(
+            Q(vendor__name__icontains=query) | Q(buyer__fio__icontains=query)
+        ).filter(status__in=status).order_by('-time_create')
 
 
 class DeliveryListView(SuperUserRequiredMixin, IndexView):
@@ -49,7 +56,13 @@ class DeliveryListView(SuperUserRequiredMixin, IndexView):
     }
 
     def get_queryset(self):
-        return Document.objects.filter(vendor__isnull=False).order_by('-time_create')
+        query = self.request.GET.get('search', '')
+        status = self.request.GET.get('status')
+        status = (status, ) if status else Status
+        return Document.objects.filter(
+            vendor__isnull=False).filter(
+            vendor__name__icontains=query).filter(
+            status__in=status).order_by('-time_create')
 
 
 class ShipmentListView(SuperUserRequiredMixin, IndexView):
@@ -62,7 +75,13 @@ class ShipmentListView(SuperUserRequiredMixin, IndexView):
     }
 
     def get_queryset(self):
-        return Document.objects.filter(buyer__isnull=False).order_by('-time_create')
+        query = self.request.GET.get('search', '')
+        status = self.request.GET.get('status')
+        status = (status, ) if status else Status
+        return Document.objects.filter(
+            buyer__isnull=False).filter(
+            buyer__fio__icontains=query).filter(
+            status__in=status).order_by('-time_create')
 
 
 class DocumentView(LoginRequiredMixin, DataMixin, DetailView):
