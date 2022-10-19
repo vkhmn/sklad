@@ -6,7 +6,7 @@ from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import redirect, get_object_or_404, render
 from django.views.generic import ListView, DetailView, CreateView, TemplateView
 from django.urls import reverse_lazy
-from django.db.models import Count, Sum, F, Min
+from django.db.models import Count, Sum, F, Min, Q
 
 from sklad.mixin import DataMixin, SuperUserRequiredMixin
 from sklad.forms import *
@@ -35,6 +35,7 @@ class IndexView(LoginRequiredMixin, DataMixin, ListView):
         context = super().get_context_data(**kwargs)
         c_def = self.get_user_context()
         context = dict(list(context.items()) + list(c_def.items()))
+        context['search_form'] = SearchForm()
         return context
 
 
@@ -111,10 +112,12 @@ class NomenclatureListView(SuperUserRequiredMixin, DataMixin, ListView):
         context['subcats'] = SubCategory.objects.annotate(total=Count(
             'nomenclature')
         ).filter(total__gt=0).order_by('category__name', 'name')
+        context['search_form'] = SearchForm(data=self.request.GET)
         return context
 
     def get_queryset(self):
-        return Nomenclature.objects.annotate(
+        query = self.request.GET.get('search', '')
+        return Nomenclature.objects.filter(name__icontains=query).annotate(
             store_amount=F('store__amount')).order_by(
             'subcategory__category__name',
             'subcategory__name',
@@ -170,6 +173,7 @@ class CategoryBase(SuperUserRequiredMixin, DataMixin, ListView):
         context['subcats'] = SubCategory.objects.annotate(total=Count(
             'nomenclature')
         ).filter(total__gt=0).order_by('category__name', 'name')
+        context['search_form'] = SearchForm(data=self.request.GET)
         return context
 
 
@@ -183,8 +187,10 @@ class CategoryView(CategoryBase):
         return context
 
     def get_queryset(self):
+        query = self.request.GET.get('search', '')
         return Nomenclature.objects.filter(
-            subcategory__category=self.kwargs['pk']).annotate(
+            subcategory__category=self.kwargs['pk']
+        ).filter(name__icontains=query).annotate(
             store_amount=F('store__amount')).order_by(
             'subcategory__name',
             'name'
@@ -201,8 +207,9 @@ class SubCategoryView(CategoryBase):
         return context
 
     def get_queryset(self):
+        query = self.request.GET.get('search', '')
         return Nomenclature.objects.filter(
-            subcategory=self.kwargs['pk']
+            Q(subcategory=self.kwargs['pk'])).filter(Q(name__icontains=query)
         ).annotate(store_amount=F('store__amount')).order_by('name')
 
 

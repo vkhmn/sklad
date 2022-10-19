@@ -108,3 +108,12 @@ class LoginUserForm(AuthenticationForm):
             attrs={'class': 'form-control'}
         )
     )
+
+
+class SearchForm(forms.Form):
+    search = forms.CharField(
+        label='Поиск',
+        widget=forms.TextInput(
+            attrs={'class': 'form-control'}
+        )
+    )
