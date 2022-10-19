@@ -39,6 +39,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'sklad.apps.SkladConfig',
+    'app.core.apps.CoreConfig',
+    'app.contactor.apps.ContactorConfig',
+    'app.document.apps.DocumentConfig',
+    'app.nomenclature.apps.NomenclatureConfig',
     'bootstrap4',
 ]
 
