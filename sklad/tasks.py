@@ -1,8 +1,8 @@
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
 
-from sklad_django.celery import app
-from sklad_django.settings import EMAIL_HOST_USER
+from config.celery import app
+from config.settings import EMAIL_HOST_USER
 from sklad.enams import messages
 from sklad.models import Document, Status
 from sklad.utils import get_confirm_url, make_qrcode

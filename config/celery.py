@@ -1,9 +1,9 @@
 import os
 from celery import Celery
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'sklad_django.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
 
-app = Celery('sklad_django')
+app = Celery('config')
 app.config_from_object('django.conf:settings')
 
 # Load task modules from all registered Django app configs.
