@@ -1,18 +1,4 @@
-from app.document.models import Status
-
-
-messages = {
-    Status.COLLECTED: {
-        'subject': 'Заказ собран',
-        'message': 'Ваш заказ собран!\n'
-                   'Отсканируйте qr код, и подтвердите получение заказа! '
-    },
-    Status.CANCELED: {
-        'subject': 'Заказ отменен',
-        'message': 'Нет товара на складе'
-    }
-}
-
+"""Main menu config."""
 menu = [
     {
         'url_name': 'vendor_list',

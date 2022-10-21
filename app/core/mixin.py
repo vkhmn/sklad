@@ -15,6 +15,7 @@ class SuperUserRequiredMixin(LoginRequiredMixin):
 
 
 class DataMixin:
+    """Add common context to View."""
 
     def get_user_context(self, **kwargs):
         context = kwargs

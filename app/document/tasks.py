@@ -3,8 +3,8 @@ from django.template.loader import render_to_string
 
 from config.celery import app
 from config.settings import EMAIL_HOST_USER
-from app.core.enams import messages
 from app.core.utils import get_confirm_url, make_qrcode
+from .enams import messages
 from .models import Document, Status
 
 # TODO:
@@ -29,7 +29,7 @@ def send_email_to_buyer(document_id, status):
             context['qrcode'] = make_qrcode(document_id)
             context['url'] = get_confirm_url(document_id)
 
-        html_message = render_to_string('sklad/templates/document/email.html', context)
+        html_message = render_to_string('document/email.html', context)
 
         send_mail(
             context['subject'],

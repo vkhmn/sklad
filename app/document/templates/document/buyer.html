@@ -1,17 +1,17 @@
 <h3>Заявка на отгрузку</h3>
 <br><br>
-       <div class="form-group row">
-            <div class="col-md-3 col-form-label form-control-label text-muted">Номер заявки</div>
-            <div class="col-md-3 col-form-label form-control-label" >{{ document.pk }}</div>
-        </div>
-       <div class="form-group row">
-            <div class="col-md-3 col-form-label form-control-label text-muted">Дата</div>
-            <div class="col-md-3 col-form-label form-control-label" >{{ document.time_create }}</div>
-        </div>
-       <div class="form-group row">
-            <div class="col-md-3 col-form-label form-control-label text-muted">Покупатель</div>
-            <div class="col-md-3 col-form-label form-control-label" >{{ document.buyer }}</div>
-        </div>
+<div class="form-group row">
+    <div class="col-md-3 col-form-label form-control-label text-muted">Номер заявки</div>
+    <div class="col-md-3 col-form-label form-control-label" >{{ document.pk }}</div>
+</div>
+<div class="form-group row">
+    <div class="col-md-3 col-form-label form-control-label text-muted">Дата</div>
+    <div class="col-md-3 col-form-label form-control-label" >{{ document.time_create|date:"d-m-Y H:i:s" }}</div>
+</div>
+<div class="form-group row">
+    <div class="col-md-3 col-form-label form-control-label text-muted">Покупатель</div>
+    <div class="col-md-3 col-form-label form-control-label" >{{ document.buyer }}</div>
+</div>
 <table class="table">
     <thead>
     <tr class="table-secondary">
@@ -48,22 +48,22 @@
     </tfoot>
 </table>
 
-        <div class="form-group row">
-            <div class="col-md-3 col-form-label form-control-label text-muted">Статус</div>
-            <div class="col-md-3 col-form-label form-control-label">
-                {% if document.status == 'ca' %}
-                    <div class="text-danger">
-                {% elif document.status == 'fi' %}
-                    <div class="text-success">
-                {% elif document.status == 'co'%}
-                    <div class="text-warning">
-                {% else %}
-                    <div>
-                {% endif %}
-                {{ document.get_status_display }}
-                </div>
-            </div>
+<div class="form-group row">
+    <div class="col-md-3 col-form-label form-control-label text-muted">Статус</div>
+    <div class="col-md-3 col-form-label form-control-label">
+        {% if document.status == 'ca' %}
+            <div class="text-danger">
+        {% elif document.status == 'fi' %}
+            <div class="text-success">
+        {% elif document.status == 'co'%}
+            <div class="text-warning">
+        {% else %}
+            <div>
+        {% endif %}
+        {{ document.get_status_display }}
         </div>
+    </div>
+</div>
 
 {% if document.status in 'co,fi' %}
     <p><img src="data:image/png;base64,{{ qrcode }}" width="100" height="100"/></p>

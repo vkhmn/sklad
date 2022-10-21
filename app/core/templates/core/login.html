@@ -1,8 +1,6 @@
 {% extends 'core/base.html' %}
  
 {% block content %}
-
-
     <h3>{{ title }}</h3>
     <br><br>
     <form method="post">
@@ -12,10 +10,10 @@
             <div class="form-group row">
                 <label class="col-md-1 col-form-label form-control-label text-muted" for="{{ f.id_for_label }}">{{ f.label }}</label>
                 <div class="col-lg-4">{{ f }}</div>
-                <div class="form-error">{{ f.errors }}</div>
+                <div class="text-danger">{{ f.errors }}</div>
             </div>
         {% endfor %}
+
         <button type="submit" class="btn btn-success">Войти</button>
     </form>
-
 {% endblock %}

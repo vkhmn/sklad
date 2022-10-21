@@ -2,8 +2,8 @@
 
 {% block content %}
     {% if document.buyer %}
-        {% include 'document/document_buyer.html' %}
+        {% include 'document/buyer.html' %}
     {% elif document.vendor %}
-        {% include 'document/document_vendor.html' %}
+        {% include 'document/vendor.html' %}
     {% endif %}
 {% endblock %}

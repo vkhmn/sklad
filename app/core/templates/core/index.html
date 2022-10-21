@@ -4,11 +4,12 @@
     {% include 'core/left_menu.html' %}
 {% endblock %}
 
-{% block content %}
+{% block breadcrumbs %}
+    {% include 'core/search.html' %}
+{% endblock %}
 
-    {% include 'core/search.html' %}<br><br>
+{% block content %}
     <h3>{{ title }}</h3>
     <br><br>
-    {% include 'document/document_list.html' %}
-
+    {% include 'document/list.html' %}
 {% endblock %}

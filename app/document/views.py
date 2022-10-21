@@ -11,235 +11,172 @@ from app.core.mixin import DataMixin, SuperUserRequiredMixin
 from app.core.forms import SearchForm
 from app.core.utils import make_qrcode, decode
 from app.nomenclature.models import Store
+from .enams import delivery_menu, shipment_menu
 from .forms import DeliveryAddForm, DocumentNomenclaturesFormSet
 from .forms import ShipmentAddForm
 from .models import Document, Status, DocumentNomenclatures
+from .services import get_documents_filter, get_deliveries_filter, \
+    get_shipments_filter, get_total, get_nomenclatures, create_document
 from .tasks import send_email_to_buyer
 
 
-class IndexView(LoginRequiredMixin, DataMixin, ListView):
-    """"Веб сервис отображающий главную страницу, с последними заявками на
-    отгрузку (поставку) товара."""
+class HomeView(LoginRequiredMixin, DataMixin, ListView):
+    """Render home page with all documents."""
 
     model = Document
-    template_name = 'document/index.html'
+    template_name = 'core/index.html'
     context_object_name = 'documents'
-    extra_context = {'title': 'Заявки на поставку/отгрузку'}
     login_url = reverse_lazy('login')
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
-        c_def = self.get_user_context()
-        context = dict(list(context.items()) + list(c_def.items()))
-        context['search_form'] = SearchForm(data=self.request.GET)
+        context.update(
+            self.get_user_context(
+                title='Заявки на поставку/отгрузку',
+                search_form=SearchForm(data=self.request.GET)
+            )
+        )
         return context
 
-    def get_query_search(self):
-        return self.request.GET.get('search', '')
-
-    def get_status(self):
+    def get_params(self):
+        query = self.request.GET.get('search', '')
         status = self.request.GET.get('status')
         status = (status, ) if status else Status
-        return status
+        return query, status
 
     def get_queryset(self):
-        query = self.get_query_search()
-        status = self.get_status()
-        return Document.objects.filter(
-            Q(vendor__name__icontains=query) | Q(buyer__person__name__icontains=query)
-        ).filter(status__in=status).order_by('-time_create')
+        return get_documents_filter(*self.get_params())
 
 
-class DeliveryListView(SuperUserRequiredMixin, IndexView):
-    """"Веб сервис для работы с заявками на поставку."""
+class DeliveryListView(SuperUserRequiredMixin, HomeView):
+    """Render page with all delivery documents."""
+
     extra_context = {
-        'left_menu': [
-            {'url_name': 'delivery_add', 'title': 'Создать заявку'}
-        ],
+        'left_menu': delivery_menu,
         'title': 'Заявки на поставку',
     }
 
     def get_queryset(self):
-        query = self.get_query_search()
-        status = self.get_status()
-        return Document.objects.filter(
-            vendor__isnull=False).filter(
-            vendor__name__icontains=query).filter(
-            status__in=status).order_by('-time_create')
+        return get_deliveries_filter(*self.get_params())
 
 
-class ShipmentListView(SuperUserRequiredMixin, IndexView):
-    """"Веб сервис для работы с заявками."""
+class ShipmentListView(SuperUserRequiredMixin, HomeView):
+    """Render page with all delivery documents."""
+
     extra_context = {
-        'left_menu': [
-            {'url_name': 'shipment_add', 'title': 'Создать заявку'}
-        ],
+        'left_menu': shipment_menu,
         'title': 'Заявки на отгрузку',
     }
 
     def get_queryset(self):
-        query = self.get_query_search()
-        status = self.get_status()
-        return Document.objects.filter(
-            buyer__isnull=False).filter(
-            buyer__fio__icontains=query).filter(
-            status__in=status).order_by('-time_create')
+        return get_shipments_filter(*self.get_params())
 
 
 class DocumentView(LoginRequiredMixin, DataMixin, DetailView):
-    """" Веб сервис для работы с заявкой
-    на поставку/отгрузку (отображение карточки) """
+    """Render document details."""
 
     model = Document
-    template_name = 'document/document.html'
+    template_name = 'document/details.html'
     context_object_name = 'document'
     login_url = reverse_lazy('login')
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
-        c_def = self.get_user_context(title="Информация по заявке")
-        context = dict(list(context.items()) + list(c_def.items()))
-        context['qrcode'] = make_qrcode(self.object.pk)
-
-        # Select Sum(price * amount), Min(store.amount - amount)
-        # for document.nomenclatures
-        context['total'] = self.object.nomenclatures.aggregate(
-            sum=Sum(F('documentnomenclatures__amount') * F('price')),
-            min=Min(F('store__amount') - F('documentnomenclatures__amount'))
-        )
-
-        # Select price * amount, amount, store.amount
-        # for each document.nomenclatures
-        context['result'] = self.object.nomenclatures.annotate(
-            total=F('documentnomenclatures__amount') * F('price'),
-            amount=F('documentnomenclatures__amount'),
-            store_amount=F('store__amount')
+        context.update(
+            self.get_user_context(
+                title='Информация по заявке',
+                qrcode=make_qrcode(self.object.pk),
+                total=get_total(self.object),
+                result=get_nomenclatures(self.object)
+            )
         )
         return context
 
 
 class DeliveryAddView(SuperUserRequiredMixin, DataMixin, TemplateView):
-    """"Веб сервис для создания заявки на поставку. """
+    """Add new delivery document."""
 
-    template_name = 'document/document_add.html'
+    template_name = 'document/add.html'
     success_url = reverse_lazy('delivery_list')
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
-        c_def = self.get_user_context(title='Создание заяки на поставку')
-        context['document_add_form'] = DeliveryAddForm()
-        context['document_nomenclature_form_set'] = DocumentNomenclaturesFormSet()
-        return dict(list(context.items()) + list(c_def.items()))
+        context.update(
+            self.get_user_context(
+                title='Создание заяки на поставку',
+                document_add_form=DeliveryAddForm(),
+                document_nomenclature_form_set=DocumentNomenclaturesFormSet()
+            )
+        )
+        return context
+
+    def form_invalid(self, form):
+        """If the form is invalid, render the invalid form."""
+        contex = self.get_context_data()
+        contex.update(form)
+        return self.render_to_response(contex)
 
     def post(self, request, *args, **kwargs):
-        document_add_form = DeliveryAddForm(request.POST)
-        document_nomenclature_form_set = DocumentNomenclaturesFormSet(
-            data=request.POST
-        )
-        if document_add_form.is_valid() or document_nomenclature_form_set.is_valid():
-            print(document_add_form.is_valid())
-            document = Document(
-                vendor=document_add_form.cleaned_data.get('contactor')
-            )
+        forms = {
+            'document_add_form': DeliveryAddForm(request.POST),
+            'document_nomenclature_form_set': DocumentNomenclaturesFormSet(
+                data=request.POST
+            ),
+        }
+        # Validate forms
+        for form in forms.values():
+            if not form.is_valid():
+                return self.form_invalid(forms)
 
-            # Generate valid nomenclatures list
-            nomenclatures = []
-            for form in document_nomenclature_form_set:
-                print(form.is_valid())
-                try:
-                    nomenclature = DocumentNomenclatures(
-                        **form.cleaned_data,
-                        document=document
-                    )
-                    nomenclature.full_clean(exclude=['document'])
-                    nomenclatures.append(nomenclature)
-                except ValidationError:
-                    print('Error')
-
-            if nomenclatures:
-                document.save()
-
-                # Merge dublicate nomenclature item
-                nomenclatures_dict = dict()
-                for n in nomenclatures:
-                    if n.nomenclature in nomenclatures_dict:
-                        nomenclatures_dict[n.nomenclature].amount += n.amount
-                    else:
-                        nomenclatures_dict[n.nomenclature] = n
-
-                [nomenclature.save() for nomenclature in nomenclatures_dict.values()]
-            else:
-                document_add_form.add_error(
-                    None,
-                    'Укажите корректные данные для номенклатуры'
-                )
-                context = self.get_context_data(*args, **kwargs)
-                context['document_add_form'] = document_add_form
-                context['document_nomenclature_form_set'] = document_nomenclature_form_set
-                return self.render_to_response(context)
+        if not create_document(forms, 'vendor'):
+            _, nomenclatures_form_set = forms.values()
+            form, *_ = nomenclatures_form_set.forms
+            form.add_error(None, 'Укажите корректные данные для номенклатуры')
+            return self.form_invalid(forms)
 
         return redirect(self.success_url)
 
 
 class ShipmentAddView(SuperUserRequiredMixin, DataMixin, TemplateView):
-    """"Веб сервис для создания заявки на отгрузку. """
+    """Add new shipment document."""
 
-    template_name = 'document/document_add.html'
+    template_name = 'document/add.html'
     success_url = reverse_lazy('shipment_list')
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
-        c_def = self.get_user_context(title='Создание заявки на отгрузку')
-        context['document_add_form'] = ShipmentAddForm()
-        context['document_nomenclature_form_set'] = DocumentNomenclaturesFormSet()
-        return dict(list(context.items()) + list(c_def.items()))
+        context.update(
+            self.get_user_context(
+                title='Создание заяки отгрузку',
+                document_add_form=ShipmentAddForm(),
+                document_nomenclature_form_set=DocumentNomenclaturesFormSet()
+            )
+        )
+        return context
+
+    def form_invalid(self, form):
+        """If the form is invalid, render the invalid form."""
+        contex = self.get_context_data()
+        contex.update(form)
+        return self.render_to_response(contex)
 
     def post(self, request, *args, **kwargs):
-        document_add_form = ShipmentAddForm(request.POST)
-        document_nomenclature_form_set = DocumentNomenclaturesFormSet(
-            data=request.POST
-        )
-        if document_add_form.is_valid() or document_nomenclature_form_set.is_valid():
-            print(document_add_form.is_valid())
-            document = Document(
-                buyer=document_add_form.cleaned_data.get('contactor')
-            )
+        forms = {
+            'document_add_form': ShipmentAddForm(request.POST),
+            'document_nomenclature_form_set': DocumentNomenclaturesFormSet(
+                data=request.POST
+            ),
+        }
+        # Validate forms
+        for form in forms.values():
+            if not form.is_valid():
+                return self.form_invalid(forms)
 
-            # Generate valid nomenclatures list
-            nomenclatures = []
-            for form in document_nomenclature_form_set:
-                print(form.is_valid())
-                try:
-                    nomenclature = DocumentNomenclatures(
-                        **form.cleaned_data,
-                        document=document
-                    )
-                    nomenclature.full_clean(exclude=['document'])
-                    nomenclatures.append(nomenclature)
-                except ValidationError:
-                    print('Error')
-
-            if nomenclatures:
-                document.save()
-
-                # Merge dublicate nomenclature item
-                nomenclatures_dict = dict()
-                for n in nomenclatures:
-                    if n.nomenclature in nomenclatures_dict:
-                        nomenclatures_dict[n.nomenclature].amount += n.amount
-                    else:
-                        nomenclatures_dict[n.nomenclature] = n
-
-                [nomenclature.save() for nomenclature in nomenclatures_dict.values()]
-            else:
-                document_add_form.add_error(
-                    None,
-                    'Укажите корректные данные для номенклатуры'
-                )
-                context = self.get_context_data(*args, **kwargs)
-                context['document_add_form'] = document_add_form
-                context['document_nomenclature_form_set'] = document_nomenclature_form_set
-                return self.render_to_response(context)
+        if not create_document(forms, 'buyer'):
+            _, nomenclatures_form_set = forms.values()
+            form, *_ = nomenclatures_form_set.forms
+            form.add_error(None, 'Укажите корректные данные для номенклатуры')
+            return self.form_invalid(forms)
 
         return redirect(self.success_url)
 
@@ -247,7 +184,7 @@ class ShipmentAddView(SuperUserRequiredMixin, DataMixin, TemplateView):
 class ConfirmView(DataMixin, TemplateView):
     """ Веб сервис для подтвеждения заказа покупателем """
 
-    template_name = 'document/document_confirm.html'
+    template_name = 'document/confirm.html'
     context_object_name = 'document'
 
     def get_context_data(self, *, object_list=None, **kwargs):

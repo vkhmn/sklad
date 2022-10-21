@@ -15,8 +15,11 @@
     </ul>
 {% endblock %}
 
+{% block breadcrumbs %}
+    {% include 'core/search.html' %}
+{% endblock %}
+
 {% block content %}
-    {% include 'core/search.html' %}<br><br>
     <h3>{{ title }}</h3>
     <br><br>
 

@@ -11,7 +11,7 @@ from .services import create_object, get_documents, create_vendor
 
 
 class BuyerAddView(SuperUserRequiredMixin, DataMixin, CreateView):
-    """Add new buyer to DB."""
+    """Add new buyer."""
 
     model = Buyer
     form_class = PersonAddForm
@@ -72,7 +72,7 @@ class BuyerView(SuperUserRequiredMixin, DataMixin, DetailView):
 
 
 class VendorAddView(SuperUserRequiredMixin, DataMixin, TemplateView):
-    """Add new vendor to DB."""
+    """Add new vendor."""
 
     template_name = 'contactor/vendor_add.html'
     success_url = reverse_lazy('vendor_list')
