@@ -93,11 +93,46 @@ class DocumentView(LoginRequiredMixin, DataMixin, DetailView):
         return context
 
 
-class DeliveryAddView(SuperUserRequiredMixin, DataMixin, TemplateView):
-    """Add new delivery document."""
+class DocumentAddView(SuperUserRequiredMixin, DataMixin, TemplateView):
+    """Base class for adding document."""
 
     template_name = 'document/add.html'
+    success_url = None
+    contactor = None
+
+    def form_invalid(self, form):
+        """If the form is invalid, render the invalid form."""
+        contex = self.get_context_data()
+        contex.update(form)
+        return self.render_to_response(contex)
+
+    def post(self, request, *args, **kwargs):
+        forms = {
+            'document_add_form': None,
+            'document_nomenclature_form_set': DocumentNomenclaturesFormSet(
+                data=request.POST
+            ),
+        }
+        forms.update(kwargs)
+        # Validate forms
+        for form in forms.values():
+            if not form.is_valid():
+                return self.form_invalid(forms)
+
+        if not create_document(forms, self.contactor):
+            _, nomenclatures_form_set = forms.values()
+            form, *_ = nomenclatures_form_set.forms
+            form.add_error(None, 'Укажите корректные данные для номенклатуры')
+            return self.form_invalid(forms)
+
+        return redirect(self.success_url)
+
+
+class DeliveryAddView(DocumentAddView):
+    """Add new delivery document."""
+
     success_url = reverse_lazy('delivery_list')
+    contactor = 'vendor'
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -110,38 +145,20 @@ class DeliveryAddView(SuperUserRequiredMixin, DataMixin, TemplateView):
         )
         return context
 
-    def form_invalid(self, form):
-        """If the form is invalid, render the invalid form."""
-        contex = self.get_context_data()
-        contex.update(form)
-        return self.render_to_response(contex)
-
     def post(self, request, *args, **kwargs):
-        forms = {
-            'document_add_form': DeliveryAddForm(request.POST),
-            'document_nomenclature_form_set': DocumentNomenclaturesFormSet(
-                data=request.POST
-            ),
-        }
-        # Validate forms
-        for form in forms.values():
-            if not form.is_valid():
-                return self.form_invalid(forms)
-
-        if not create_document(forms, 'vendor'):
-            _, nomenclatures_form_set = forms.values()
-            form, *_ = nomenclatures_form_set.forms
-            form.add_error(None, 'Укажите корректные данные для номенклатуры')
-            return self.form_invalid(forms)
-
-        return redirect(self.success_url)
+        kwargs.update(
+            {
+                'document_add_form': DeliveryAddForm(request.POST)
+            }
+        )
+        return super().post(request, *args, **kwargs)
 
 
-class ShipmentAddView(SuperUserRequiredMixin, DataMixin, TemplateView):
+class ShipmentAddView(DocumentAddView):
     """Add new shipment document."""
 
-    template_name = 'document/add.html'
     success_url = reverse_lazy('shipment_list')
+    contactor = 'buyer'
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -154,31 +171,13 @@ class ShipmentAddView(SuperUserRequiredMixin, DataMixin, TemplateView):
         )
         return context
 
-    def form_invalid(self, form):
-        """If the form is invalid, render the invalid form."""
-        contex = self.get_context_data()
-        contex.update(form)
-        return self.render_to_response(contex)
-
     def post(self, request, *args, **kwargs):
-        forms = {
-            'document_add_form': ShipmentAddForm(request.POST),
-            'document_nomenclature_form_set': DocumentNomenclaturesFormSet(
-                data=request.POST
-            ),
-        }
-        # Validate forms
-        for form in forms.values():
-            if not form.is_valid():
-                return self.form_invalid(forms)
-
-        if not create_document(forms, 'buyer'):
-            _, nomenclatures_form_set = forms.values()
-            form, *_ = nomenclatures_form_set.forms
-            form.add_error(None, 'Укажите корректные данные для номенклатуры')
-            return self.form_invalid(forms)
-
-        return redirect(self.success_url)
+        kwargs.update(
+            {
+                'document_add_form': ShipmentAddForm(request.POST)
+            }
+        )
+        return super().post(request, *args, **kwargs)
 
 
 class ConfirmView(DataMixin, TemplateView):
