@@ -1,11 +1,13 @@
 from django.db import models
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 from django.urls import reverse
 
 
 class Category(models.Model):
     """ Категория номенклатуры """
 
-    name = models.CharField('Категория', max_length=100)
+    name = models.CharField('Категория', max_length=100, unique=True)
 
     def __str__(self):
         return self.name
@@ -21,7 +23,7 @@ class Category(models.Model):
 class SubCategory(models.Model):
     """ Подкатегория номенклатуры """
 
-    name = models.CharField('Подкатегория', max_length=100)
+    name = models.CharField('Подкатегория', max_length=100, unique=True)
     category = models.ForeignKey(
         Category,
         on_delete=models.CASCADE,
@@ -60,3 +62,29 @@ class Nomenclature(models.Model):
     class Meta:
         verbose_name = 'Номенклатура'
         verbose_name_plural = 'Номенклатура'
+
+
+class Store(models.Model):
+    """ Остаток на складе """
+
+    nomenclature = models.OneToOneField(
+        Nomenclature,
+        on_delete=models.CASCADE,
+        verbose_name='Номенклатура'
+    )
+    amount = models.IntegerField(
+        'Количество',
+        default=0
+    )
+
+    def __str__(self):
+        return f'{self.nomenclature} - {self.amount}'
+
+    class Meta:
+        verbose_name = 'Склад'
+        verbose_name_plural = 'Склад'
+
+
+@receiver(post_save, sender=Nomenclature)
+def update_stock(sender, instance, **kwargs):
+    Store.objects.create(nomenclature=instance)

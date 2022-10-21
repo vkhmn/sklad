@@ -1,0 +1,54 @@
+{% extends 'core/base.html' %}
+
+{% block left_menu %}
+    {% include 'core/left_menu.html' %}
+{% endblock %}
+
+{% block content %}
+
+    <h3>Сведения о поставщике</h3><br><br>
+
+    <div class="form-group row">
+        <div class="col-md-3 col-form-label form-control-label text-muted">Поставщик</div>
+        <div class="col-md-3 col-form-label form-control-label" >{{ vendor.name }}</div>
+    </div>
+     <div class="form-group row">
+        <div class="col-md-3 col-form-label form-control-label text-muted">Адрес</div>
+        <div class="col-md-3 col-form-label form-control-label" >{{ vendor.address }}</div>
+    </div>
+     <div class="form-group row">
+        <div class="col-md-3 col-form-label form-control-label text-muted">Фамилия Имя Отчество</div>
+        <div class="col-md-3 col-form-label form-control-label" >{{ vendor.contact_person.full_name }}</div>
+    </div>
+     <div class="form-group row">
+        <div class="col-md-3 col-form-label form-control-label text-muted">Email</div>
+        <div class="col-md-3 col-form-label form-control-label" >{{ vendor.contact_person.email }}</div>
+    </div>
+     <div class="form-group row">
+        <div class="col-md-3 col-form-label form-control-label text-muted">Телефон</div>
+        <div class="col-md-3 col-form-label form-control-label" >{{ vendor.contact_person.phone }}</div>
+    </div>
+
+    <div class="form-group row">
+        <div class="col-md-3 col-form-label form-control-label text-muted">Категории товаров:</div>
+        <div class="col-md-3 col-form-label form-control-label" >
+            {% for cat in vendor.categories.all %}
+                {{ cat }}{% if not forloop.last %}, {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+    <p>Банковские реквизиты:</p>
+    <div class="form-group row">
+        <div class="col-md-3 col-form-label form-control-label text-muted">Наименования банка</div>
+        <div class="col-md-3 col-form-label form-control-label" >{{ vendor.bank_details.bank_name }}</div>
+    </div>
+    <div class="form-group row">
+        <div class="col-md-3 col-form-label form-control-label text-muted">Номер счета</div>
+        <div class="col-md-3 col-form-label form-control-label" >{{ vendor.bank_details.account }}</div>
+    </div>
+
+    <hr><br><br>
+
+    {% include 'contactor/document_list.html' %}
+
+{% endblock %}

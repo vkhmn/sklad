@@ -5,27 +5,6 @@ from app.contactor.models import Vendor, Buyer
 from app.nomenclature.models import Nomenclature
 
 
-class Store(models.Model):
-    """ Остаток на складе """
-
-    nomenclature = models.ForeignKey(
-        Nomenclature,
-        on_delete=models.CASCADE,
-        verbose_name='Номенклатура'
-    )
-    amount = models.IntegerField(
-        'Количество',
-        default=0
-    )
-
-    def __str__(self):
-        return f'{self.nomenclature} - {self.amount}'
-
-    class Meta:
-        verbose_name = 'Склад'
-        verbose_name_plural = 'Склад'
-
-
 class Status(models.TextChoices):
     """ Статус заявки - choices """
 
@@ -99,3 +78,7 @@ class DocumentNomenclatures(models.Model):
 
     def __str__(self):
         return f'{self.nomenclature}  - ({self.amount} шт.)'
+
+    class Meta:
+        verbose_name = 'Номенклатура документа'
+        verbose_name_plural = 'Номенклатура документа'

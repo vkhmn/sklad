@@ -4,9 +4,8 @@ from django.db.models import Count, Sum, F, Q
 
 from app.core.mixin import SuperUserRequiredMixin, DataMixin
 from app.core.forms import SearchForm
-from app.document.models import Store
 from .forms import NomenklatureAddForm
-from .models import Nomenclature, SubCategory, Category
+from .models import Nomenclature, SubCategory, Category, Store
 
 
 class NomenclatureListView(SuperUserRequiredMixin, DataMixin, ListView):
@@ -14,7 +13,7 @@ class NomenclatureListView(SuperUserRequiredMixin, DataMixin, ListView):
     (отображение, поиск, добавление)."""
 
     model = Nomenclature
-    template_name = 'sklad/nomenclature_list.html'
+    template_name = 'nomenclature/nomenclature_list.html'
     context_object_name = 'nomenclatures'
 
     def get_context_data(self, *, object_list=None, **kwargs):
@@ -39,7 +38,7 @@ class NomenclatureListView(SuperUserRequiredMixin, DataMixin, ListView):
 
 class CategoryBase(SuperUserRequiredMixin, DataMixin, ListView):
     model = Nomenclature
-    template_name = 'sklad/nomenclature_list.html'
+    template_name = 'nomenclature/nomenclature_list.html'
     context_object_name = 'nomenclatures'
 
     def get_context_data(self, *, object_list=None, **kwargs):
@@ -95,7 +94,7 @@ class NomenclatureView(SuperUserRequiredMixin, DataMixin, DetailView):
       (отображение карточки)"""
 
     model = Nomenclature
-    template_name = 'sklad/nomenclature.html'
+    template_name = 'nomenclature/nomenclature.html'
     context_object_name = 'nomenclature'
 
     def get_context_data(self, *, object_list=None, **kwargs):
@@ -125,7 +124,7 @@ class NomenklatureAddView(SuperUserRequiredMixin, DataMixin, CreateView):
     """"Веб сервис для добавления номенклатуры. """
 
     form_class = NomenklatureAddForm
-    template_name = 'sklad/nomenclature_add.html'
+    template_name = 'nomenclature/nomenclature_add.html'
     success_url = reverse_lazy('nomenclature_list')
     #    login_url = reverse_lazy('home')
     raise_exception = True

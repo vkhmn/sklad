@@ -1,0 +1,108 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+    <style>
+        .search:focus{
+            background-color: #E8E8E8;
+        }
+        .link {
+            text-decoration: none;
+        }
+        .not-visible{
+            display: none;
+        }
+        .result-card{
+            width:50%;
+            max-height: 200px;
+            box-shadow: 0 8px 8px 0 rgba(0,0,0,0.25);
+            transition: .5s;
+            border-radius: 7px;
+            padding: 15px 15px;
+            margin: auto;
+        }
+
+        .webseries{
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+        }
+
+    </style>
+
+    <div class="w-100 text-center">
+        <form autocomplete="off" id="search-form" method="post">
+            {% csrf_token %}
+            <input type="text" id="search-input" class="p-3 w-50 search mt-4" placeholder="Search for Nomenclature">
+        </form>
+        <!-- result card -->
+        <div id="result-box" class="result-card not-visible">
+
+        </div>
+    </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        const sendSearchData = (series) => {
+            console.log(series)
+            $.ajax({
+                type: 'POST',
+                url: '{% url "search" %}',
+                data: {
+                    'csrfmiddlewaretoken': csrf,
+                    'series': series,
+                },
+                success: (res) => {
+                    const data = res.data
+                    result_box.innerHTML = ''
+                    if (Array.isArray(data)) {
+                        data.forEach(series => {
+                            result_box.innerHTML += `
+                                <a href="${series.url}" class="link">
+                                       <div class ='row mt-2 mb-2'>
+                                            <div class='col-2'>
+                                            </div>
+                                            <div class="col-10">
+                                                <h5>${series.name}</h5>
+                                            </div>
+                                        </div>
+                                </a>`
+                        });
+                        console.log(0)
+                    } else {
+                        if (search_input.value.length > 0) {
+                            console.log(1)
+                            result_box.innerHTML = `<b>${data}</b>`
+                        } else {
+                            console.log(2)
+                            result_box.classList.add('not-visilbe')
+                        }
+
+                    }
+
+                },
+                error: (err) => {
+                    console.log(err);
+                }
+            })
+        }
+
+        console.log("Hello world!")
+        const search_form = document.getElementById("search-form")
+        const search_input = document.getElementById("search-input")
+        const result_box = document.getElementById("result-box")
+
+        const csrf = document.getElementsByName("csrfmiddlewaretoken")[0].value
+
+        search_input.addEventListener('keyup', e=>{
+            console.log(e.target.value)
+
+            if (result_box.classList.contains('not-visible')){
+                result_box.classList.remove('not-visible')
+            }
+            sendSearchData(e.target.value)
+        });
+    </script>
+
+        {{ context }}
+
+{% endblock %}

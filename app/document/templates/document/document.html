@@ -1,0 +1,9 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+    {% if document.buyer %}
+        {% include 'document/document_buyer.html' %}
+    {% elif document.vendor %}
+        {% include 'document/document_vendor.html' %}
+    {% endif %}
+{% endblock %}

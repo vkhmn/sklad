@@ -1,0 +1,14 @@
+{% extends 'core/base.html' %}
+
+{% block left_menu %}
+    {% include 'core/left_menu.html' %}
+{% endblock %}
+
+{% block content %}
+
+    {% include 'core/search.html' %}<br><br>
+    <h3>{{ title }}</h3>
+    <br><br>
+    {% include 'document/document_list.html' %}
+
+{% endblock %}

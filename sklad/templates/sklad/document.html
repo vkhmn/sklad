@@ -1,9 +1,0 @@
-{% extends 'sklad/base.html' %}
-
-{% block content %}
-    {% if document.buyer %}
-        {% include 'sklad/document_buyer.html' %}
-    {% elif document.vendor %}
-        {% include 'sklad/document_vendor.html' %}
-    {% endif %}
-{% endblock %}

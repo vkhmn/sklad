@@ -1,0 +1,7 @@
+<h3>Последние заявки</h3>
+<br><br>
+{% if documents  %}
+    {% include 'document/document_list.html' %}
+{% else %}
+    Заявок нет
+{% endif %}

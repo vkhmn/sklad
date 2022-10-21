@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Nomenclature, Category, SubCategory
+from .models import Nomenclature, Category, SubCategory, Store
 
 
 @admin.register(Nomenclature)
@@ -15,4 +15,9 @@ class CategoryAdmin(admin.ModelAdmin):
 
 @admin.register(SubCategory)
 class SubCategoryAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(Store)
+class DocumentAdmin(admin.ModelAdmin):
     pass

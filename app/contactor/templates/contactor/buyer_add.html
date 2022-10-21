@@ -1,0 +1,22 @@
+{% extends 'core/base.html' %}
+
+{% block left_menu %}
+    {% include 'core/left_menu.html' %}
+{% endblock %}
+
+{% block content %}
+    <h3>{{ title }}</h3>
+    <br><br>
+    <form method="post">
+        {% csrf_token %}
+        <div class="text-danger">{{ form.non_field_errors }}</div>
+        {% for f in form %}
+            <div class="form-group row">
+                <label class="col-md-3 col-form-label form-control-label text-muted" for="{{ f.id_for_label }}">{{ f.label }}</label>
+                <div class="col-lg-4">{{ f }}</div>
+                <div class="text-danger">{{ f.errors }}</div>
+            </div>
+        {% endfor %}
+        <button type="submit" class="btn btn-success">Добавить</button>
+    </form>
+{% endblock %}

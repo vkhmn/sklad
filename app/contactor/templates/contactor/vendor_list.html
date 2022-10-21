@@ -1,0 +1,27 @@
+{% extends 'core/base.html' %}
+
+{% block left_menu %}
+    {% include 'core/left_menu.html' %}
+{% endblock %}
+
+{% block content %}
+<h3>{{ title }}</h3><br><br>
+    <table class="table">
+        <thead>
+        <tr class="table-secondary">
+            <th scope="col">#</th>
+            <th scope="col">Наименование</th>
+            <th scope="col">Email</th>
+        </tr>
+        </thead>
+        {% for n in vendors %}
+            <tbody>
+            <tr>
+                <td></td>
+                <td><a href="{{ n.get_absolute_url }}">{{ n.name }}</a></td>
+                <td>{{ n.contact_person.email }}</td>
+            </tr>
+            </tbody>
+        {% endfor %}
+    </table>
+{% endblock %}

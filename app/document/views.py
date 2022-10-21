@@ -10,9 +10,10 @@ from django.db.models import Sum, F, Min, Q
 from app.core.mixin import DataMixin, SuperUserRequiredMixin
 from app.core.forms import SearchForm
 from app.core.utils import make_qrcode, decode
+from app.nomenclature.models import Store
 from .forms import DeliveryAddForm, DocumentNomenclaturesFormSet
 from .forms import ShipmentAddForm
-from .models import Document, Status, Store, DocumentNomenclatures
+from .models import Document, Status, DocumentNomenclatures
 from .tasks import send_email_to_buyer
 
 
@@ -21,7 +22,7 @@ class IndexView(LoginRequiredMixin, DataMixin, ListView):
     отгрузку (поставку) товара."""
 
     model = Document
-    template_name = 'sklad/index.html'
+    template_name = 'document/index.html'
     context_object_name = 'documents'
     extra_context = {'title': 'Заявки на поставку/отгрузку'}
     login_url = reverse_lazy('login')
@@ -45,7 +46,7 @@ class IndexView(LoginRequiredMixin, DataMixin, ListView):
         query = self.get_query_search()
         status = self.get_status()
         return Document.objects.filter(
-            Q(vendor__name__icontains=query) | Q(buyer__fio__icontains=query)
+            Q(vendor__name__icontains=query) | Q(buyer__person__name__icontains=query)
         ).filter(status__in=status).order_by('-time_create')
 
 
@@ -90,7 +91,7 @@ class DocumentView(LoginRequiredMixin, DataMixin, DetailView):
     на поставку/отгрузку (отображение карточки) """
 
     model = Document
-    template_name = 'sklad/document.html'
+    template_name = 'document/document.html'
     context_object_name = 'document'
     login_url = reverse_lazy('login')
 
@@ -120,7 +121,7 @@ class DocumentView(LoginRequiredMixin, DataMixin, DetailView):
 class DeliveryAddView(SuperUserRequiredMixin, DataMixin, TemplateView):
     """"Веб сервис для создания заявки на поставку. """
 
-    template_name = 'sklad/document_add.html'
+    template_name = 'document/document_add.html'
     success_url = reverse_lazy('delivery_list')
 
     def get_context_data(self, *, object_list=None, **kwargs):
@@ -183,7 +184,7 @@ class DeliveryAddView(SuperUserRequiredMixin, DataMixin, TemplateView):
 class ShipmentAddView(SuperUserRequiredMixin, DataMixin, TemplateView):
     """"Веб сервис для создания заявки на отгрузку. """
 
-    template_name = 'sklad/document_add.html'
+    template_name = 'document/document_add.html'
     success_url = reverse_lazy('shipment_list')
 
     def get_context_data(self, *, object_list=None, **kwargs):
@@ -246,7 +247,7 @@ class ShipmentAddView(SuperUserRequiredMixin, DataMixin, TemplateView):
 class ConfirmView(DataMixin, TemplateView):
     """ Веб сервис для подтвеждения заказа покупателем """
 
-    template_name = 'sklad/document_confirm.html'
+    template_name = 'document/document_confirm.html'
     context_object_name = 'document'
 
     def get_context_data(self, *, object_list=None, **kwargs):

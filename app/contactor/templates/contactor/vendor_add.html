@@ -1,0 +1,44 @@
+{% extends 'core/base.html' %}
+
+{% block left_menu %}
+    {% include 'core/left_menu.html' %}
+{% endblock %}
+
+{% block content %}
+    <h3>{{ title }}</h3>
+    <br><br>
+    <form method="post">
+        {% csrf_token %}
+        <div class="text-danger">{{ vendor_form.non_field_errors }}</div>
+        {% for f in vendor_form %}
+            <div class="form-group row">
+                <label class="col-md-3 col-form-label form-control-label text-muted" for="{{ f.id_for_label }}">{{ f.label }}</label>
+                <div class="col-lg-4">{{ f }}</div>
+                <div class="text-danger">{{ f.errors }}</div>
+            </div>
+        {% endfor %}
+
+        <p>Контактное лицо:</p>
+        <div class="text-danger">{{ contact_person_form.non_field_errors }}</div>
+        {% for f in contact_person_form %}
+            <div class="form-group row">
+                <label class="col-md-3 col-form-label form-control-label text-muted" for="{{ f.id_for_label }}">{{ f.label }}</label>
+                <div class="col-lg-4">{{ f }}</div>
+                <div class="text-danger">{{ f.errors }}</div>
+            </div>
+        {% endfor %}
+
+        <p>Банковские реквизиты:</p>
+        <div class="text-danger">{{ bank_details_form.non_field_errors }}</div>
+        {% for f in bank_details_form %}
+            <div class="form-group row">
+                <label class="col-md-3 col-form-label form-control-label text-muted" for="{{ f.id_for_label }}">{{ f.label }}</label>
+                <div class="col-lg-4">{{ f }}</div>
+                <div class="text-danger">{{ f.errors }}</div>
+            </div>
+        {% endfor %}
+
+        <button type="submit" class="btn btn-success">Добавить</button>
+    </form>
+
+{% endblock %}

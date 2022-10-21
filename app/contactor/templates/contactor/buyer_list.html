@@ -1,0 +1,27 @@
+{% extends 'core/base.html' %}
+
+{% block left_menu %}
+    {% include 'core/left_menu.html' %}
+{% endblock %}
+
+{% block content %}
+<h3>{{ title }}</h3><br><br>
+    <table class="table">
+    <thead>
+    <tr class="table-secondary">
+        <th scope="col">#</th>
+        <th scope="col">Фамилия Имя Отчество</th>
+        <th scope="col">Email</th>
+    </tr>
+    </thead>
+    {% for n in buyers %}
+        <tbody>
+            <tr>
+                <td></td>
+                <td><a href="{{ n.get_absolute_url }}">{{ n.person.full_name }}</a></td>
+                <td>{{ n.person.email }}</td>
+            </tr>
+        </tbody>
+    {% endfor %}
+    </table>
+{% endblock %}
