@@ -1,23 +1,19 @@
-from django.core.exceptions import ValidationError
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import Http404
-from django.shortcuts import redirect, get_object_or_404
+from django.shortcuts import redirect
 from django.views.generic import ListView, DetailView, TemplateView
 from django.urls import reverse_lazy, reverse
-from django.db.models import Sum, F, Min, Q
 
 
 from app.core.mixin import DataMixin, SuperUserRequiredMixin
 from app.core.forms import SearchForm
-from app.core.utils import make_qrcode, decode
-from app.nomenclature.models import Store
+from app.core.utils import make_qrcode
 from .enams import delivery_menu, shipment_menu
 from .forms import DeliveryAddForm, DocumentNomenclaturesFormSet
 from .forms import ShipmentAddForm
-from .models import Document, Status, DocumentNomenclatures
+from .models import Document, Status
 from .services import get_documents_filter, get_deliveries_filter, \
-    get_shipments_filter, get_total, get_nomenclatures, create_document
-from .tasks import send_email_to_buyer
+    get_shipments_filter, get_total, get_nomenclatures, create_document, \
+    get_document_or_404, change_document_status, change_document_status_confirm
 
 
 class HomeView(LoginRequiredMixin, DataMixin, ListView):
@@ -181,81 +177,54 @@ class ShipmentAddView(DocumentAddView):
 
 
 class ConfirmView(DataMixin, TemplateView):
-    """ Веб сервис для подтвеждения заказа покупателем """
+    """Confirm buyer order. Change document status."""
 
     template_name = 'document/confirm.html'
     context_object_name = 'document'
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
-        c_def = self.get_user_context(title="Подтвеждение получения товара")
-        return dict(list(context.items()) + list(c_def.items()))
+        context.update(
+            self.get_user_context(title="Подтвеждение получения товара")
+        )
+        return context
 
     def post(self, request, *args, **kwargs):
-        context = self.get_context_data(**kwargs)
         code = request.POST.get('code')
-        if not code:
-            raise Http404
-        document_id = decode(code)
-        d = get_object_or_404(Document, pk=document_id)
-        context['document_id'] = document_id
-        if d.status != Status.COLLECTED:
-            raise Http404
-        d.status = Status.FINISHED
-        d.save()
+        context = self.get_context_data(**kwargs)
+        document = get_document_or_404(code)
+        context.update(
+            document_id=document.pk
+        )
+        change_document_status_confirm(document)
         return self.render_to_response(context)
 
     def get(self, request, *args, **kwargs):
         code = request.GET.get('code')
-        if not code:
-            raise Http404
         context = self.get_context_data(**kwargs)
-        document_id = decode(code)
-        get_object_or_404(Document, pk=document_id)
-        context['document_id'] = document_id
+        context.update(
+            document_id=get_document_or_404(code).pk
+        )
         return self.render_to_response(context)
 
 
 class UpdateStatusDocumentView(DocumentView):
-    """ Веб сервис для обновления статуса заказа отгрузки """
+    """Change document status."""
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
-        c_def = self.get_user_context(title="Информация по заявке")
-        context = dict(list(context.items()) + list(c_def.items()))
+        context.update(
+            self.get_user_context(title="Информация по заявке")
+        )
         return context
 
     def get(self, request, *args, **kwargs):
-        super().get(self, request, *args, **kwargs)
-
+        super().get(self, request, *args, **kwargs)  # Get document object
         status = self.kwargs.get('status')
-        document_id = self.kwargs.get('pk')
-
-        if status not in Status:
-            raise Http404("Status code is not founded")
-
-        if self.object.status in (Status.FINISHED, status):
-            raise Http404("Can't change Status code")
-
-        self.object.status = status
-        self.object.save()
-
-        if self.object.vendor is not None:
-            if status in (Status.FINISHED, ):
-                # Add nomenclatures amount to Store
-                for item in DocumentNomenclatures.objects.filter(document=self.object):
-                    Store.objects.filter(nomenclature=item.nomenclature).update(
-                        amount=F('amount') + item.amount
-                    )
-
-        if self.object.buyer is not None:
-            if status in (Status.CANCELED, Status.COLLECTED):
-                send_email_to_buyer.delay(document_id, status)
-
-            if status in (Status.COLLECTED, ):
-                # Sub nomenclatures amount to Store (Reserve)
-                for item in DocumentNomenclatures.objects.filter(document=self.object):
-                    Store.objects.filter(nomenclature=item.nomenclature).update(
-                        amount=F('amount') - item.amount
-                    )
-        return redirect(reverse('document', args={document_id: document_id}))
+        change_document_status(self.object, status)
+        return redirect(
+            reverse(
+                'document',
+                args={self.object.pk: self.object.pk}
+            )
+        )

@@ -13,7 +13,7 @@ from .models import Document, Status
 
 @app.task
 def send_email_to_buyer(document_id, status):
-    user_email = Document.objects.get(pk=document_id).buyer.email
+    user_email = Document.objects.get(pk=document_id).buyer.person.email
 
     if not user_email:
         raise ValueError('У покупателя нет email адреса')
