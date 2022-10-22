@@ -59,7 +59,9 @@ class CategoryView(CategoryBase):
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['title'] = get_category_name(self.kwargs.get('pk'))
+        context.update(
+            title=get_category_name(self.kwargs.get('pk'))
+        )
         return context
 
     def get_queryset(self):
@@ -74,7 +76,9 @@ class SubCategoryView(CategoryBase):
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['title'] = get_subcategory_name(self.kwargs.get('pk'))
+        context.update(
+            title=get_subcategory_name(self.kwargs.get('pk'))
+        )
         return context
 
     def get_queryset(self):

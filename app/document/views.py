@@ -6,14 +6,19 @@ from django.urls import reverse_lazy, reverse
 
 from app.core.mixin import DataMixin, SuperUserRequiredMixin
 from app.core.forms import SearchForm
-from app.core.utils import make_qrcode
 from .enams import delivery_menu, shipment_menu
 from .forms import DeliveryAddForm, DocumentNomenclaturesFormSet
 from .forms import ShipmentAddForm
 from .models import Document, Status
-from .services import get_documents_filter, get_deliveries_filter, \
-    get_shipments_filter, get_total, get_nomenclatures, create_document, \
-    get_document_or_404, change_document_status, change_document_status_confirm
+from .services import (
+    get_documents_filter,
+    get_deliveries_filter,
+    get_shipments_filter,
+    DocumentContext,
+    DocumentAdd,
+    ConfirmDocument,
+    ChangeDocumentStatus
+)
 
 
 class HomeView(LoginRequiredMixin, DataMixin, ListView):
@@ -81,9 +86,7 @@ class DocumentView(LoginRequiredMixin, DataMixin, DetailView):
         context.update(
             self.get_user_context(
                 title='Информация по заявке',
-                qrcode=make_qrcode(self.object.pk),
-                total=get_total(self.object),
-                result=get_nomenclatures(self.object)
+                **DocumentContext.execute(self.object)
             )
         )
         return context
@@ -115,7 +118,7 @@ class DocumentAddView(SuperUserRequiredMixin, DataMixin, TemplateView):
             if not form.is_valid():
                 return self.form_invalid(forms)
 
-        if not create_document(forms, self.contactor):
+        if not DocumentAdd.execute(forms, self.contactor):
             _, nomenclatures_form_set = forms.values()
             form, *_ = nomenclatures_form_set.forms
             form.add_error(None, 'Укажите корректные данные для номенклатуры')
@@ -143,9 +146,7 @@ class DeliveryAddView(DocumentAddView):
 
     def post(self, request, *args, **kwargs):
         kwargs.update(
-            {
-                'document_add_form': DeliveryAddForm(request.POST)
-            }
+            document_add_form=DeliveryAddForm(request.POST)
         )
         return super().post(request, *args, **kwargs)
 
@@ -169,9 +170,7 @@ class ShipmentAddView(DocumentAddView):
 
     def post(self, request, *args, **kwargs):
         kwargs.update(
-            {
-                'document_add_form': ShipmentAddForm(request.POST)
-            }
+            document_add_form=ShipmentAddForm(request.POST)
         )
         return super().post(request, *args, **kwargs)
 
@@ -192,18 +191,16 @@ class ConfirmView(DataMixin, TemplateView):
     def post(self, request, *args, **kwargs):
         code = request.POST.get('code')
         context = self.get_context_data(**kwargs)
-        document = get_document_or_404(code)
         context.update(
-            document_id=document.pk
+            ConfirmDocument.execute(code, change_status=True)
         )
-        change_document_status_confirm(document)
         return self.render_to_response(context)
 
     def get(self, request, *args, **kwargs):
         code = request.GET.get('code')
         context = self.get_context_data(**kwargs)
         context.update(
-            document_id=get_document_or_404(code).pk
+            ConfirmDocument.execute(code, change_status=False)
         )
         return self.render_to_response(context)
 
@@ -221,7 +218,7 @@ class UpdateStatusDocumentView(DocumentView):
     def get(self, request, *args, **kwargs):
         super().get(self, request, *args, **kwargs)  # Get document object
         status = self.kwargs.get('status')
-        change_document_status(self.object, status)
+        ChangeDocumentStatus.execute(self.object, status)
         return redirect(
             reverse(
                 'document',

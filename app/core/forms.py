@@ -20,6 +20,7 @@ class LoginUserForm(AuthenticationForm):
 class SearchForm(forms.Form):
     search = forms.CharField(
         label='Поиск',
+        required=False,
         widget=forms.TextInput(
             attrs={'class': 'form-control'}
         )
