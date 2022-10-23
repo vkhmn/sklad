@@ -1,9 +1,9 @@
 {% extends 'core/base.html' %}
 
 {% block content %}
-    {% if document.buyer %}
+    {% if document.buyer_id %}
         {% include 'document/buyer.html' %}
-    {% elif document.vendor %}
+    {% elif document.vendor_id %}
         {% include 'document/vendor.html' %}
     {% endif %}
 {% endblock %}

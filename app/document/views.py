@@ -6,7 +6,7 @@ from django.urls import reverse_lazy, reverse
 
 from app.core.mixin import DataMixin, SuperUserRequiredMixin
 from app.core.forms import SearchForm
-from .enams import delivery_menu, shipment_menu
+from .enums import delivery_menu, shipment_menu
 from .forms import DeliveryAddForm, DocumentNomenclaturesFormSet
 from .forms import ShipmentAddForm
 from .models import Document, Status

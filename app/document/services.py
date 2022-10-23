@@ -10,24 +10,28 @@ from app.core.utils import decode, make_qrcode
 
 
 def get_documents_filter(query, status):
-    return Document.objects.filter(
-        Q(vendor__name__icontains=query) |
-        Q(buyer__person__full_name__icontains=query)).filter(
-        status__in=status).order_by('-time_create')
+    return Document.objects.select_related('vendor', 'buyer__person').filter(
+        (
+           Q(vendor__name__icontains=query) |
+           Q(buyer__person__full_name__icontains=query)
+        ) & Q(status__in=status)
+    ).order_by('-time_create')
 
 
 def get_deliveries_filter(query, status):
-    return Document.objects.filter(
-        vendor__isnull=False).filter(
-        vendor__name__icontains=query).filter(
-        status__in=status).order_by('-time_create')
+    return Document.objects.select_related('vendor').filter(
+        Q(vendor__isnull=False) &
+        Q(vendor__name__icontains=query) &
+        Q(status__in=status)
+    ).order_by('-time_create')
 
 
 def get_shipments_filter(query, status):
-    return Document.objects.filter(
-        buyer__isnull=False).filter(
-        buyer__person__full_name__icontains=query).filter(
-        status__in=status).order_by('-time_create')
+    return Document.objects.select_related('buyer__person').filter(
+        Q(buyer__isnull=False) &
+        Q(buyer__person__full_name__icontains=query) &
+        Q(status__in=status)
+    ).order_by('-time_create')
 
 
 class DocumentContext:
@@ -105,7 +109,9 @@ class DocumentAdd:
         })
         for nomenclature in nomenclatures:
             nomenclature.document = document
-            nomenclature.save()
+        DocumentNomenclatures.objects.bulk_create(
+            nomenclatures
+        )
         return True
 
     @classmethod

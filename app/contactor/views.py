@@ -7,7 +7,7 @@ from .enums import buyer_menu, vendor_menu
 from .forms import PersonAddForm, BankDetailsAddForm, VendorAddForm
 from .models import Buyer, Vendor
 from app.core.mixin import SuperUserRequiredMixin, DataMixin
-from .services import create_object, get_documents, create_vendor
+from .services import create_object, get_documents, create_vendor, get_buyers, get_vendors
 
 
 class BuyerAddView(SuperUserRequiredMixin, DataMixin, CreateView):
@@ -50,6 +50,9 @@ class BuyerListView(SuperUserRequiredMixin, DataMixin, ListView):
             )
         )
         return context
+
+    def get_queryset(self):
+        return get_buyers()
 
 
 class BuyerView(SuperUserRequiredMixin, DataMixin, DetailView):
@@ -127,6 +130,9 @@ class VendorListView(SuperUserRequiredMixin, DataMixin, ListView):
             )
         )
         return context
+
+    def get_queryset(self):
+        return get_vendors()
 
 
 class VendorView(SuperUserRequiredMixin, DataMixin, DetailView):

@@ -1,8 +1,17 @@
+from app.contactor.models import Buyer, Vendor
 from app.document.models import Document
 
 
 def get_documents(**fields):
     return Document.objects.filter(**fields).order_by('-time_create')
+
+
+def get_buyers():
+    return Buyer.objects.select_related('person')
+
+
+def get_vendors():
+    return Vendor.objects.select_related('contact_person')
 
 
 def create_object(model, **fields):

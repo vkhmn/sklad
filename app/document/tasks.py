@@ -4,7 +4,7 @@ from django.template.loader import render_to_string
 from config.celery import app
 from config.settings import EMAIL_HOST_USER
 from app.core.utils import get_confirm_url, make_qrcode
-from .enams import messages
+from .enums import messages
 from .models import Document, Status
 
 # TODO:

@@ -9,8 +9,7 @@ from .models import Nomenclature
 from .services import get_subcats, get_nomenclatures_list, get_category_name
 
 from .services import get_nomenclatures_category, get_subcategory_name
-from .services import get_nomenclatures_subcategory, get_subcategories
-from .services import get_category_total, get_store
+from .services import get_nomenclatures_subcategory, NomenclatureContext
 
 
 class NomenclatureListView(SuperUserRequiredMixin, DataMixin, ListView):
@@ -96,13 +95,10 @@ class NomenclatureView(SuperUserRequiredMixin, DataMixin, DetailView):
     context_object_name = 'nomenclature'
 
     def get_context_data(self, *, object_list=None, **kwargs):
-        category = self.object.subcategory.category
         context = super().get_context_data(**kwargs)
         context.update(
             self.get_user_context(
-                subcategories=get_subcategories(category),
-                store=get_store(self.object),
-                total_category=get_category_total(category),
+                **NomenclatureContext.execute(self.object)
             )
         )
         return context

@@ -9,21 +9,36 @@ def get_subcats():
         total__gt=0).order_by('category__name', 'name')
 
 
-def get_subcategories(category):
-    return SubCategory.objects.filter(category=category)
+class NomenclatureContext:
+    @classmethod
+    def _get_subcategories(cls, category):
+        return SubCategory.objects.filter(category=category)
 
+    @classmethod
+    def _get_store(cls, nomenclature):
+        return Store.objects.get(nomenclature=nomenclature).amount
 
-def get_store(nomenclature):
-    return Store.objects.get(nomenclature=nomenclature).amount
+    @classmethod
+    def _get_category_total(cls, category):
+        return Store.objects.filter(
+            nomenclature__in=Nomenclature.objects.filter(
+                subcategory__in=cls._get_subcategories(category)
+            )).aggregate(
+            sum=Sum(F('nomenclature__price') * F('amount'))
+        ).get('sum')
 
+    @classmethod
+    def _get_category(cls, nomenclature: Nomenclature):
+        return nomenclature.subcategory.category
 
-def get_category_total(category):
-    return Store.objects.filter(
-        nomenclature__in=Nomenclature.objects.filter(
-            subcategory__in=get_subcategories(category)
-        )).aggregate(
-        sum=Sum(F('nomenclature__price') * F('amount'))
-    ).get('sum')
+    @classmethod
+    def execute(cls, nomenclature):
+        category = cls._get_category(nomenclature)
+        return dict(
+            subcategories=cls._get_subcategories(category),
+            store=cls._get_store(nomenclature),
+            total_category=cls._get_category_total(category),
+        )
 
 
 def get_nomenclatures_list(query):

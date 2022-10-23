@@ -17,7 +17,7 @@ class DeliveryAddForm(forms.Form):
 
 class ShipmentAddForm(forms.Form):
     contactor = forms.ModelChoiceField(
-        queryset=Buyer.objects.all(),
+        queryset=Buyer.objects.select_related('person'),
         label='Покупатель',
         widget=forms.Select(
             attrs={'class': 'form-control'}
