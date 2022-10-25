@@ -1,10 +1,13 @@
+from operator import xor
+from typing import Callable
+
 from django.core.exceptions import ValidationError
 from django.db.models import Sum, F, Min, Q
 from django.http import Http404
 from django.shortcuts import get_object_or_404
 
-from .models import Document, DocumentNomenclatures, Status
-from .tasks import send_email_to_buyer
+from app.document.models import Document, DocumentNomenclatures, Status
+from app.document.tasks.task1 import send_email_to_buyer
 from app.nomenclature.models import Store
 from app.core.utils import decode, make_qrcode
 
@@ -130,61 +133,92 @@ class ConfirmDocument:
         return get_object_or_404(Document, pk=document_id)
 
     @classmethod
-    def _change_document_status_confirm(cls, document):
-        if document.status != Status.COLLECTED:
-            raise Http404
-        document.status = Status.FINISHED
-        document.save()
-
-    @classmethod
     def execute(cls, code, change_status=False):
         document = cls._get_document_or_404(code)
         if change_status:
-            cls._change_document_status_confirm(document)
+            ChangeDocumentStatus.execute(document, Status.FINISHED)
         return dict(document_id=document.pk)
 
 
 class ChangeDocumentStatus:
     """Изменение статуса документа."""
 
-    @classmethod
-    def _change_status(cls, document, status):
-        # Проверка на корректность передаваемого статуса.
-        if status not in Status:
-            raise Http404("Код статуса не найден!")
-
-        # Текущий статус документа равен статусу Завершен,
-        # либо равен пердаваемому статусу.
-        if document.status in (Status.FINISHED, status):
-            raise Http404("Невозможно изменить текущий статус документа!")
-
+    @classmethod  #
+    def _change_status(cls, document: Document, status: str) -> None:
         document.status = status
         document.save()
 
+    @classmethod  #
+    def _buyer_va_co(cls, document: Document, status: str) -> None:
+        send_email_to_buyer.delay(document.pk, status)
+        cls._decrease_store_amount(document)
+        cls._change_status(document, status)
+
+    @classmethod  #
+    def _buyer_va_ca(cls, document: Document, status: str) -> None:
+        cls._change_status(document, status)
+        send_email_to_buyer.delay(document.pk, status)
+
+    @classmethod  #
+    def _buyer_co_ca(cls, document: Document, status: str) -> None:
+        cls._change_status(document, status)
+        send_email_to_buyer.delay(document.pk, status)
+        cls._increase_store_amount(document)
+
+    @classmethod  #
+    def _vendor_va_fi(cls, document: Document, status: str) -> None:
+        cls._change_status(document, status)
+        cls._increase_store_amount(document)
+
     @classmethod
-    def _increase_store_amount(cls, document):
+    def _increase_store_amount(cls, document: Document) -> None:
         for item in DocumentNomenclatures.objects.filter(document=document):
             Store.objects.filter(nomenclature=item.nomenclature).update(
                 amount=F('amount') + item.amount
             )
 
     @classmethod
-    def _decrease_store_amount(cls, document):
+    def _decrease_store_amount(cls, document: Document) -> None:
         for item in DocumentNomenclatures.objects.filter(document=document):
             Store.objects.filter(nomenclature=item.nomenclature).update(
                 amount=F('amount') - item.amount
             )
 
     @classmethod
-    def execute(cls, document, status):
-        cls._change_status(document, status)
-        # Увеличить количество номенлатуры на складе (Поставка).
-        if document.vendor is not None:
-            if status in (Status.FINISHED,):
-                cls._increase_store_amount(document)
-        # Уменьшить количество номенклатуры на складе (Отгрузка)
-        elif document.buyer is not None:
-            if status in (Status.CANCELED, Status.COLLECTED):
-                send_email_to_buyer.delay(document.pk, status)
-            if status in (Status.COLLECTED,):
-                cls._decrease_store_amount(document)
+    def _get_transitions(cls, begin_state: str, end_state: str) -> tuple:
+        return begin_state, end_state
+
+    @classmethod
+    def _document_incorrect(cls):
+        raise Http404("Документ не корректный!")
+
+    @classmethod
+    def _transions_not_found(cls, *args):
+        raise Http404("Невозможно изменить текущий статус!")
+
+    @classmethod
+    def execute(cls, document: Document, status: str) -> None:
+        vendor_transitions = {
+            (Status.VALIDATING, Status.CANCELED): cls._change_status,
+            (Status.VALIDATING, Status.FINISHED): cls._vendor_va_fi,
+        }
+        buyer_transitions = {
+            (Status.VALIDATING, Status.COLLECTED): cls._buyer_va_co,
+            (Status.VALIDATING, Status.CANCELED): cls._buyer_va_ca,
+            (Status.COLLECTED, Status.CANCELED): cls._buyer_co_ca,
+            (Status.COLLECTED, Status.FINISHED): cls._change_status,
+        }
+
+        contactor = None
+        if not xor(bool(document.vendor), bool(document.buyer)):
+            cls._document_incorrect()  # raise Http404
+        elif document.vendor:
+            contactor = vendor_transitions
+        elif document.buyer:
+            contactor = buyer_transitions
+
+        func: Callable[[Document, str], None] = contactor.get(
+            cls._get_transitions(document.status, status),
+            cls._transions_not_found
+        )
+        func(document, status)

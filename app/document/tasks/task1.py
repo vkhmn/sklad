@@ -4,11 +4,8 @@ from django.template.loader import render_to_string
 from config.celery import app
 from config.settings import EMAIL_HOST_USER
 from app.core.utils import get_confirm_url, make_qrcode
-from .enums import messages
-from .models import Document, Status
-
-# TODO:
-# Add new periodic task -> Cancel old orders
+from app.document.enums import messages
+from app.document.models import Document, Status
 
 
 @app.task

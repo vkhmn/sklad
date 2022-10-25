@@ -206,7 +206,7 @@ class ConfirmView(DataMixin, TemplateView):
         return self.render_to_response(context)
 
 
-class UpdateStatusDocumentView(DocumentView):
+class ChangeDocumentStatusView(DocumentView):
     """Представление для изменения статуса документа."""
 
     def get_context_data(self, *, object_list=None, **kwargs):
