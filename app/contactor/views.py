@@ -40,6 +40,7 @@ class BuyerListView(SuperUserRequiredMixin, DataMixin, ListView):
     model = Buyer
     template_name = 'contactor/buyer_list.html'
     context_object_name = 'buyers'
+    paginate_by = 10
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -120,6 +121,7 @@ class VendorListView(SuperUserRequiredMixin, DataMixin, ListView):
     model = Vendor
     template_name = 'contactor/vendor_list.html'
     context_object_name = 'vendors'
+    paginate_by = 2
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)

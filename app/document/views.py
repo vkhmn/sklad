@@ -28,6 +28,7 @@ class HomeView(LoginRequiredMixin, DataMixin, ListView):
     template_name = 'core/index.html'
     context_object_name = 'documents'
     login_url = reverse_lazy('login')
+    paginate_by = 3
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)

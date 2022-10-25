@@ -5,8 +5,12 @@ register = template.Library()
 
 @register.simple_tag
 def query_transform(request, **kwargs):
-    """Return url with adding params."""
+    """Добавляет параметры к GET запросу."""
 
     updated = request.GET.copy()
-    updated.update(kwargs)
+    values_dict = updated.dict()
+    updated.clear()
+    values_dict.update(kwargs)
+    updated.update(values_dict)
+    print(updated)
     return updated.urlencode()
