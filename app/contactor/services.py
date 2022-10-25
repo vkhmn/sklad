@@ -2,8 +2,11 @@ from app.contactor.models import Buyer, Vendor
 from app.document.models import Document
 
 
-def get_documents(**fields):
-    return Document.objects.filter(**fields).order_by('-time_create')
+def get_documents(count=5, **fields):
+    return Document.objects.select_related(
+        'vendor', 'buyer__person').filter(
+        **fields
+    ).order_by('-time_create')[:count]
 
 
 def get_buyers():

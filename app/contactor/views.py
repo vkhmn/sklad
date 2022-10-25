@@ -11,7 +11,7 @@ from .services import create_object, get_documents, create_vendor, get_buyers, g
 
 
 class BuyerAddView(SuperUserRequiredMixin, DataMixin, CreateView):
-    """Add new buyer."""
+    """Представление для добавления нового покупателя."""
 
     model = Buyer
     form_class = PersonAddForm
@@ -35,7 +35,7 @@ class BuyerAddView(SuperUserRequiredMixin, DataMixin, CreateView):
 
 
 class BuyerListView(SuperUserRequiredMixin, DataMixin, ListView):
-    """Render Buyer list."""
+    """Представление для отображения списка покупателей."""
 
     model = Buyer
     template_name = 'contactor/buyer_list.html'
@@ -56,7 +56,7 @@ class BuyerListView(SuperUserRequiredMixin, DataMixin, ListView):
 
 
 class BuyerView(SuperUserRequiredMixin, DataMixin, DetailView):
-    """ Render Buyer details and his documents. """
+    """Представление для отображения детальной информации о покупателе."""
 
     model = Buyer
     template_name = 'contactor/buyer_details.html'
@@ -68,14 +68,14 @@ class BuyerView(SuperUserRequiredMixin, DataMixin, DetailView):
             self.get_user_context(
                 title='Сведения о покупателе',
                 left_menu=buyer_menu,
-                documents=get_documents(buyer=self.object)
+                documents=get_documents(buyer=self.object, count=10)
             )
         )
         return context
 
 
 class VendorAddView(SuperUserRequiredMixin, DataMixin, TemplateView):
-    """Add new vendor."""
+    """Отображение для добавления нового поставщика."""
 
     template_name = 'contactor/vendor_add.html'
     success_url = reverse_lazy('vendor_list')
@@ -93,7 +93,7 @@ class VendorAddView(SuperUserRequiredMixin, DataMixin, TemplateView):
         return context
 
     def form_invalid(self, form):
-        """If the form is invalid, render the invalid form."""
+        """Если форма не валидна, возвращаем страницу с данными формы."""
         contex = self.get_context_data()
         contex.update(form)
         return self.render_to_response(contex)
@@ -104,18 +104,18 @@ class VendorAddView(SuperUserRequiredMixin, DataMixin, TemplateView):
             'contact_person_form': PersonAddForm(request.POST),
             'bank_details_form': BankDetailsAddForm(request.POST),
         }
-        # Validate forms
+        # Валидация формы. Если форма не валидна то возвращаем страницу с данными формы.
         for form in forms.values():
             if not form.is_valid():
                 return self.form_invalid(forms)
 
-        # Save forms
+        # Сохрание данных формы в БД.
         create_vendor(forms)
         return redirect(self.success_url)
 
 
 class VendorListView(SuperUserRequiredMixin, DataMixin, ListView):
-    """Render Vendor list."""
+    """Отображение для списка поставщиков."""
 
     model = Vendor
     template_name = 'contactor/vendor_list.html'
@@ -136,7 +136,7 @@ class VendorListView(SuperUserRequiredMixin, DataMixin, ListView):
 
 
 class VendorView(SuperUserRequiredMixin, DataMixin, DetailView):
-    """ Render Vendor details and his documents. """
+    """Отображение для деталей поставщика и его последних документов."""
 
     model = Vendor
     template_name = 'contactor/vendor_details.html'
@@ -148,7 +148,7 @@ class VendorView(SuperUserRequiredMixin, DataMixin, DetailView):
             self.get_user_context(
                 title='Сведения о поставщике',
                 left_menu=buyer_menu,
-                documents=get_documents(vendor=self.object)
+                documents=get_documents(vendor=self.object, count=10)
             )
         )
         return context

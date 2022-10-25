@@ -17,7 +17,6 @@ class Status(models.TextChoices):
 class Document(models.Model):
     """ Заявка на поставку/отгрузку товаров """
 
-    # number = models.IntegerField('Номер заявки')
     vendor = models.ForeignKey(
         Vendor,
         on_delete=models.DO_NOTHING,

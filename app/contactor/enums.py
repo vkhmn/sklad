@@ -1,3 +1,4 @@
+# Меню покупателей
 buyer_menu = [
     {
         'url_name': 'buyer_add',
@@ -5,6 +6,7 @@ buyer_menu = [
     }
 ]
 
+# Меню поставщиков
 vendor_menu = [
     {
         'url_name': 'vendor_add',

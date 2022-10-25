@@ -11,7 +11,7 @@ from ..nomenclature.models import Nomenclature
 
 
 class LoginUser(DataMixin, LoginView):
-    """ Login """
+    """Представление для авторизации пользователя."""
 
     form_class = LoginUserForm
     template_name = 'core/login.html'
@@ -30,7 +30,7 @@ class LoginUser(DataMixin, LoginView):
 
 
 def logout_user(request):
-    """ Logout """
+    """Представление для выхода пользователя."""
 
     logout(request)
     return redirect('login')

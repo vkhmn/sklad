@@ -1,4 +1,4 @@
-"""Main menu config."""
+"""Список элементов главного меню."""
 menu = [
     {
         'url_name': 'vendor_list',

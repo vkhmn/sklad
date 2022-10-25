@@ -22,7 +22,7 @@ from .services import (
 
 
 class HomeView(LoginRequiredMixin, DataMixin, ListView):
-    """Render home page with all documents."""
+    """Представление для главной страницы."""
 
     model = Document
     template_name = 'core/index.html'
@@ -50,7 +50,7 @@ class HomeView(LoginRequiredMixin, DataMixin, ListView):
 
 
 class DeliveryListView(SuperUserRequiredMixin, HomeView):
-    """Render page with all delivery documents."""
+    """Представление для отображения списка документов на поставку."""
 
     extra_context = {
         'left_menu': delivery_menu,
@@ -62,7 +62,7 @@ class DeliveryListView(SuperUserRequiredMixin, HomeView):
 
 
 class ShipmentListView(SuperUserRequiredMixin, HomeView):
-    """Render page with all delivery documents."""
+    """Представление для отображения списка документов на отгрузку."""
 
     extra_context = {
         'left_menu': shipment_menu,
@@ -74,7 +74,7 @@ class ShipmentListView(SuperUserRequiredMixin, HomeView):
 
 
 class DocumentView(LoginRequiredMixin, DataMixin, DetailView):
-    """Render document details."""
+    """Представление для отображения деталей документа."""
 
     model = Document
     template_name = 'document/details.html'
@@ -93,7 +93,7 @@ class DocumentView(LoginRequiredMixin, DataMixin, DetailView):
 
 
 class DocumentAddView(SuperUserRequiredMixin, DataMixin, TemplateView):
-    """Base class for adding document."""
+    """Базовый класс представления для создания документа."""
 
     template_name = 'document/add.html'
     success_url = None
@@ -128,7 +128,7 @@ class DocumentAddView(SuperUserRequiredMixin, DataMixin, TemplateView):
 
 
 class DeliveryAddView(DocumentAddView):
-    """Add new delivery document."""
+    """Представление для создания документа на поставку."""
 
     success_url = reverse_lazy('delivery_list')
     contactor = 'vendor'
@@ -152,7 +152,7 @@ class DeliveryAddView(DocumentAddView):
 
 
 class ShipmentAddView(DocumentAddView):
-    """Add new shipment document."""
+    """Отображание для создания документа на отгрузку."""
 
     success_url = reverse_lazy('shipment_list')
     contactor = 'buyer'
@@ -176,7 +176,7 @@ class ShipmentAddView(DocumentAddView):
 
 
 class ConfirmView(DataMixin, TemplateView):
-    """Confirm buyer order. Change document status."""
+    """Отображение для подтвеждения получения товара покупателем."""
 
     template_name = 'document/confirm.html'
     context_object_name = 'document'
@@ -206,7 +206,7 @@ class ConfirmView(DataMixin, TemplateView):
 
 
 class UpdateStatusDocumentView(DocumentView):
-    """Change document status."""
+    """Представление для изменения статуса документа."""
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -216,7 +216,8 @@ class UpdateStatusDocumentView(DocumentView):
         return context
 
     def get(self, request, *args, **kwargs):
-        super().get(self, request, *args, **kwargs)  # Get document object
+        # Получить объект документа - self.object
+        super().get(self, request, *args, **kwargs)
         status = self.kwargs.get('status')
         ChangeDocumentStatus.execute(self.object, status)
         return redirect(

@@ -3,13 +3,8 @@ from django.db.models import Count, F, Q, Sum
 from .models import SubCategory, Nomenclature, Category, Store
 
 
-def get_subcats():
-    return SubCategory.objects.annotate(
-        total=Count('nomenclature')).filter(
-        total__gt=0).order_by('category__name', 'name')
-
-
 class NomenclatureContext:
+    """Возвращает контекст для номенклатуры."""
     @classmethod
     def _get_subcategories(cls, category):
         return SubCategory.objects.filter(category=category)
@@ -39,6 +34,12 @@ class NomenclatureContext:
             store=cls._get_store(nomenclature),
             total_category=cls._get_category_total(category),
         )
+
+
+def get_subcats():
+    return SubCategory.objects.annotate(
+        total=Count('nomenclature')).filter(
+        total__gt=0).order_by('category__name', 'name')
 
 
 def get_nomenclatures_list(query):

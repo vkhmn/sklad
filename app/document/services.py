@@ -35,7 +35,7 @@ def get_shipments_filter(query, status):
 
 
 class DocumentContext:
-    """Return document contex."""
+    """Возвращает контекст для документа."""
 
     @classmethod
     def _get_total(cls, document):
@@ -66,7 +66,7 @@ class DocumentContext:
 
 
 class DocumentAdd:
-    """Create document."""
+    """Создание документа."""
 
     @classmethod
     def _validate_nomenclatures(cls, form_set):
@@ -85,7 +85,7 @@ class DocumentAdd:
 
     @classmethod
     def _merge_dublicate_nomenclature(cls, nomenclatures):
-        """Merge dublicate nomenclature item."""
+        """Объединить одинаковые позиции документа."""
 
         nomenclatures_dict = dict()
         for n in nomenclatures:
@@ -120,7 +120,7 @@ class DocumentAdd:
 
 
 class ConfirmDocument:
-    """Change document status (COLLECTED -> FINISHED)."""
+    """Подверждение получения товара покупателем. (COLLECTED -> FINISHED)."""
 
     @classmethod
     def _get_document_or_404(cls, code):
@@ -145,23 +145,24 @@ class ConfirmDocument:
 
 
 class ChangeDocumentStatus:
-    """Service for change document status."""
+    """Изменение статуса документа."""
 
     @classmethod
     def _change_status(cls, document, status):
-        # Check the correct status
+        # Проверка на корректность передаваемого статуса.
         if status not in Status:
-            raise Http404("Status code is not founded")
+            raise Http404("Код статуса не найден!")
 
+        # Текущий статус документа равен статусу Завершен,
+        # либо равен пердаваемому статусу.
         if document.status in (Status.FINISHED, status):
-            raise Http404("Can't change Status code")
+            raise Http404("Невозможно изменить текущий статус документа!")
 
         document.status = status
         document.save()
 
     @classmethod
     def _increase_store_amount(cls, document):
-        # Add nomenclatures amount to Store
         for item in DocumentNomenclatures.objects.filter(document=document):
             Store.objects.filter(nomenclature=item.nomenclature).update(
                 amount=F('amount') + item.amount
@@ -169,9 +170,7 @@ class ChangeDocumentStatus:
 
     @classmethod
     def _decrease_store_amount(cls, document):
-        # Decrease nomenclatures amount to Store (Reserve)
-        for item in DocumentNomenclatures.objects.filter(
-                document=document):
+        for item in DocumentNomenclatures.objects.filter(document=document):
             Store.objects.filter(nomenclature=item.nomenclature).update(
                 amount=F('amount') - item.amount
             )
@@ -179,11 +178,11 @@ class ChangeDocumentStatus:
     @classmethod
     def execute(cls, document, status):
         cls._change_status(document, status)
-        # Increase store amount (delivery document)
+        # Увеличить количество номенлатуры на складе (Поставка).
         if document.vendor is not None:
             if status in (Status.FINISHED,):
                 cls._increase_store_amount(document)
-        # Decrease store amount (shipment document)
+        # Уменьшить количество номенклатуры на складе (Отгрузка)
         elif document.buyer is not None:
             if status in (Status.CANCELED, Status.COLLECTED):
                 send_email_to_buyer.delay(document.pk, status)

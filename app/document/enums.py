@@ -1,6 +1,6 @@
 from .models import Status
 
-
+# Контент для тела письма покупателю.
 messages = {
     Status.COLLECTED: {
         'subject': 'Заказ собран',
@@ -12,13 +12,15 @@ messages = {
         'message': 'Нет товара на складе'
     }
 }
-
+# Список элементов меню раздела Поставка.
 delivery_menu = [
     {
         'url_name': 'delivery_add',
         'title': 'Создать заявку',
     }
 ]
+
+# Список элементов меню раздела Отгрузка.
 shipment_menu = [
     {
         'url_name': 'shipment_add',

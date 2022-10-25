@@ -13,7 +13,7 @@ from .services import get_nomenclatures_subcategory, NomenclatureContext
 
 
 class NomenclatureListView(SuperUserRequiredMixin, DataMixin, ListView):
-    """Render Nomenclature list."""
+    """Представление для отображения списка номеклатуры."""
 
     model = Nomenclature
     template_name = 'nomenclature/list.html'
@@ -36,7 +36,10 @@ class NomenclatureListView(SuperUserRequiredMixin, DataMixin, ListView):
 
 
 class CategoryBase(SuperUserRequiredMixin, DataMixin, ListView):
-    """Base class for render nomenclatures with a category filter."""
+    """
+    Базовый класс представления
+    для отображения номеклатуры в зависимости от категории.
+    """
 
     model = Nomenclature
     template_name = 'nomenclature/list.html'
@@ -54,7 +57,7 @@ class CategoryBase(SuperUserRequiredMixin, DataMixin, ListView):
 
 
 class CategoryView(CategoryBase):
-    """Render nomenclatures with a category filter."""
+    """Представление для отображения номеклатуры в зависимости от категории."""
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -71,7 +74,7 @@ class CategoryView(CategoryBase):
 
 
 class SubCategoryView(CategoryBase):
-    """Render nomenclatures with a subcategory filter."""
+    """Представление для отображения номеклатуры в зависимости от подкатегории."""
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -88,7 +91,7 @@ class SubCategoryView(CategoryBase):
 
 
 class NomenclatureView(SuperUserRequiredMixin, DataMixin, DetailView):
-    """Render nomenclature details."""
+    """Представление для отображения деталей номенклатуры."""
 
     model = Nomenclature
     template_name = 'nomenclature/details.html'
@@ -105,7 +108,7 @@ class NomenclatureView(SuperUserRequiredMixin, DataMixin, DetailView):
 
 
 class NomenklatureAddView(SuperUserRequiredMixin, DataMixin, CreateView):
-    """Add new nomenclature."""
+    """Представление для создания новой номенклатуры."""
 
     form_class = NomenklatureAddForm
     template_name = 'nomenclature/add.html'
