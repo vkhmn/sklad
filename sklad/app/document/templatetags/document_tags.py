@@ -12,5 +12,4 @@ def query_transform(request, **kwargs):
     updated.clear()
     values_dict.update(kwargs)
     updated.update(values_dict)
-    print(updated)
     return updated.urlencode()

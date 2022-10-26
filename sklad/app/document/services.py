@@ -209,12 +209,12 @@ class ChangeDocumentStatus:
             (Status.COLLECTED, Status.FINISHED): cls._change_status,
         }
 
-        contactor = None
         if not xor(bool(document.vendor), bool(document.buyer)):
             cls._document_incorrect()  # raise Http404
-        elif document.vendor:
+
+        if document.vendor:
             contactor = vendor_transitions
-        elif document.buyer:
+        else:
             contactor = buyer_transitions
 
         func: Callable[[Document, str], None] = contactor.get(

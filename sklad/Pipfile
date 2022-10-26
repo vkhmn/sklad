@@ -11,6 +11,7 @@ qrcode = "*"
 pillow = "*"
 django-bootstrap4 = "*"
 django-debug-toolbar = "*"
+psycopg2-binary = "*"
 
 [dev-packages]
 
