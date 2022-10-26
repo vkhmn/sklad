@@ -1,12 +1,12 @@
 {% extends 'core/base.html' %}
 
-{% block left_menu %}
-    {% include 'core/left_menu.html' %}
-{% endblock %}
-
-{% block breadcrumbs %}
+{% block search %}
     {% include 'core/search.html' %}
 {% endblock %}
+{% block create %}
+    {% include 'core/create.html' %}
+{% endblock %}
+
 
 {% block content %}
     <h3>{{ title }}</h3>

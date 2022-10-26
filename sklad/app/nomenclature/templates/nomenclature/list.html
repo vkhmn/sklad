@@ -2,21 +2,27 @@
 
 {% block left_menu %}
     <ul id="left-chapters">
-        <li><a href="{% url 'nomenklature_add' %}">Добавить номенклатуру</a></li>
+        <br>
+        <br>
         {% regroup subcats by category as categories %}
         {% for category in categories %}
             <li><a href="{{ category.grouper.get_absolute_url }}">{{ category.grouper }}</a></li>
+            <div class="text-success">
             <ul>
                 {% for subcategory in category.list %}
                     <li><a href="{{ subcategory.get_absolute_url }}">{{ subcategory }}</a></li>
                 {% endfor %}
             </ul>
+            </div>
         {% endfor %}
     </ul>
 {% endblock %}
 
-{% block breadcrumbs %}
+{% block search %}
     {% include 'core/search.html' %}
+{% endblock %}
+{% block create %}
+    {% include 'core/create.html' %}
 {% endblock %}
 
 {% block content %}

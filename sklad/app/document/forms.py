@@ -27,7 +27,7 @@ class ShipmentAddForm(forms.Form):
 
 class DocumentNomenclaturesAddForm(forms.Form):
     nomenclature = forms.ModelChoiceField(
-        queryset=Nomenclature.objects.all(),
+        queryset=Nomenclature.objects.all().order_by('name'),
         label='Номенклатура',
         widget=forms.Select(
             attrs={'class': 'form-control'}

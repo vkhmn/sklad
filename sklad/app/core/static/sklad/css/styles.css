@@ -168,13 +168,13 @@ div.button {
 .left-chapters ul {
 	width: 230px;
 	min-height: 100%;
-	margin: 0;
-	padding: 20px 10px 10px 20px;
+	/* margin: 0; */
+	padding: 0 10px 10px 20px;
 	list-style: none;
-	font-size: 20px;
+	/*font-size: 20px;*/
 }
 .left-chapters ul li {
-	margin: 30px 0 0 0;
+	/*margin: 1px 0 0 0;*/
 	color: #999;
 }
 .left-chapters ul li.selected {color: #0059b2; }

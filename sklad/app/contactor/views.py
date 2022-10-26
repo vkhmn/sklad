@@ -3,7 +3,6 @@ from django.views.generic import ListView, DetailView, CreateView, TemplateView
 from django.urls import reverse_lazy
 from django.views.generic.edit import FormMixin
 
-from .enums import buyer_menu, vendor_menu
 from .forms import PersonAddForm, BankDetailsAddForm, VendorAddForm
 from .models import Buyer, Vendor
 from app.core.mixin import SuperUserRequiredMixin, DataMixin
@@ -22,7 +21,7 @@ class BuyerAddView(SuperUserRequiredMixin, DataMixin, CreateView):
         context = super().get_context_data(**kwargs)
         context.update(
             self.get_user_context(
-                title='Добавление покупателя'
+                title='Создание покупателя'
             )
         )
         return context
@@ -47,7 +46,7 @@ class BuyerListView(SuperUserRequiredMixin, DataMixin, ListView):
         context.update(
             self.get_user_context(
                 title='Покупатели',
-                left_menu=buyer_menu
+                create_url='buyer_add'
             )
         )
         return context
@@ -68,7 +67,6 @@ class BuyerView(SuperUserRequiredMixin, DataMixin, DetailView):
         context.update(
             self.get_user_context(
                 title='Сведения о покупателе',
-                left_menu=buyer_menu,
                 documents=get_documents(buyer=self.object, count=10)
             )
         )
@@ -85,7 +83,7 @@ class VendorAddView(SuperUserRequiredMixin, DataMixin, TemplateView):
         context = super().get_context_data(**kwargs)
         context.update(
             self.get_user_context(
-                title='Добавление поставщика',
+                title='Создание поставщика',
                 bank_details_form=BankDetailsAddForm(),
                 vendor_form=VendorAddForm(),
                 contact_person_form=PersonAddForm()
@@ -128,7 +126,7 @@ class VendorListView(SuperUserRequiredMixin, DataMixin, ListView):
         context.update(
             self.get_user_context(
                 title='Поставщики',
-                left_menu=vendor_menu
+                create_url='vendor_add',
             )
         )
         return context
@@ -149,7 +147,6 @@ class VendorView(SuperUserRequiredMixin, DataMixin, DetailView):
         context.update(
             self.get_user_context(
                 title='Сведения о поставщике',
-                left_menu=buyer_menu,
                 documents=get_documents(vendor=self.object, count=10)
             )
         )

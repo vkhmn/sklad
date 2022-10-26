@@ -1,0 +1,5 @@
+{% if create_url %}
+    <form action="{% url create_url %}" method="get">
+        <button type="submit" class="btn btn-success">Создать</button>
+    </form>
+{% endif %}

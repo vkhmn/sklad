@@ -6,7 +6,6 @@ from django.urls import reverse_lazy, reverse
 
 from app.core.mixin import DataMixin, SuperUserRequiredMixin
 from app.core.forms import SearchForm
-from .enums import delivery_menu, shipment_menu
 from .forms import DeliveryAddForm, DocumentNomenclaturesFormSet
 from .forms import ShipmentAddForm
 from .models import Document, Status
@@ -53,10 +52,15 @@ class HomeView(LoginRequiredMixin, DataMixin, ListView):
 class DeliveryListView(SuperUserRequiredMixin, HomeView):
     """Представление для отображения списка документов на поставку."""
 
-    extra_context = {
-        'left_menu': delivery_menu,
-        'title': 'Заявки на поставку',
-    }
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update(
+            self.get_user_context(
+                title='Заявки на поставку',
+                create_url='delivery_add',
+            )
+        )
+        return context
 
     def get_queryset(self):
         return get_deliveries_filter(*self.get_params())
@@ -65,10 +69,15 @@ class DeliveryListView(SuperUserRequiredMixin, HomeView):
 class ShipmentListView(SuperUserRequiredMixin, HomeView):
     """Представление для отображения списка документов на отгрузку."""
 
-    extra_context = {
-        'left_menu': shipment_menu,
-        'title': 'Заявки на отгрузку',
-    }
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update(
+            self.get_user_context(
+                title='Заявки на отгрузку',
+                create_url='shipment_add',
+            )
+        )
+        return context
 
     def get_queryset(self):
         return get_shipments_filter(*self.get_params())

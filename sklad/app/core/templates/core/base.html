@@ -52,6 +52,18 @@
 	<!-- Хлебные крошки -->
 
 	    {% block breadcrumbs %}
+            <table border="0" width="100%">
+                <tr>
+                    <td>
+                    {% block search %}
+                    {% endblock %}
+                    </td>
+                    <td align="right">
+                    {% block create %}
+                    {% endblock %}
+                    </td>
+                </tr>
+            </table>
 	    {% endblock %}
 
 <!-- Блок контента -->

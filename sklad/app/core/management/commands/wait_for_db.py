@@ -5,16 +5,16 @@ from django.core.management import BaseCommand
 
 
 class Command(BaseCommand):
-    """Django command to pause execution until db is available"""
+   """Django команда для ожидания готовности базы данных."""
 
     def handle(self, *args, **options):
-        self.stdout.write('Waiting for database...')
+        self.stdout.write('Ожидание подключения к базе данных...')
         db_conn = None
         while not db_conn:
             try:
                 db_conn = connections['default']
             except OperationalError:
-                self.stdout.write('Database unavailable, waititng 1 second...')
+                self.stdout.write('База данных не доступна, жду 1 секунду...')
                 time.sleep(1)
 
-        self.stdout.write(self.style.SUCCESS('Database available!'))
+        self.stdout.write(self.style.SUCCESS('База данных доступна!'))
