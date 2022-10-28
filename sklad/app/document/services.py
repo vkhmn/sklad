@@ -7,9 +7,10 @@ from django.http import Http404
 from django.shortcuts import get_object_or_404
 
 from app.document.models import Document, DocumentNomenclatures, Status
+from app.document.enums import messages
 from app.document.tasks.task1 import send_email_to_buyer
 from app.nomenclature.models import Store
-from app.core.utils import decode, make_qrcode
+from app.core.utils import decode, make_qrcode, get_confirm_url
 
 
 def get_documents_filter(query, status):
@@ -148,27 +149,43 @@ class ChangeDocumentStatus:
         document.status = status
         document.save()
 
+    @classmethod
+    def _send_message(cls, document, status):
+        message = messages.get((document.status, status))
+        email = document.buyer.person.email
+        if message and email:
+            confirm_url = get_confirm_url(document.pk)
+            if status == Status.COLLECTED:
+                message.update(
+                    confirm_url=confirm_url,
+                    qrcode=make_qrcode(document.pk)
+                )
+            send_email_to_buyer.delay(email, message)
+        else:
+            print(message, email, (document.status, status))
+            print('Письмо не отправлено')
+
     @classmethod  #
     def _buyer_va_co(cls, document: Document, status: str) -> None:
-        send_email_to_buyer.delay(document.pk, status)
         cls._decrease_store_amount(document)
+        cls._send_message(document, status)
         cls._change_status(document, status)
 
     @classmethod  #
     def _buyer_va_ca(cls, document: Document, status: str) -> None:
+        cls._send_message(document, status)
         cls._change_status(document, status)
-        send_email_to_buyer.delay(document.pk, status)
 
     @classmethod  #
     def _buyer_co_ca(cls, document: Document, status: str) -> None:
-        cls._change_status(document, status)
-        send_email_to_buyer.delay(document.pk, status)
         cls._increase_store_amount(document)
+        cls._send_message(document, status)
+        cls._change_status(document, status)
 
     @classmethod  #
     def _vendor_va_fi(cls, document: Document, status: str) -> None:
-        cls._change_status(document, status)
         cls._increase_store_amount(document)
+        cls._change_status(document, status)
 
     @classmethod
     def _increase_store_amount(cls, document: Document) -> None:

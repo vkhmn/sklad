@@ -1,7 +1,9 @@
 from django.urls import path
 
-from .views import NomenclatureView, NomenclatureListView, NomenklatureAddView
-from .views import CategoryView, SubCategoryView
+from app.nomenclature.views import (
+    NomenclatureView, NomenclatureListView, NomenklatureAddView,
+    CategoryView, SubCategoryView
+)
 
 
 urlpatterns = [

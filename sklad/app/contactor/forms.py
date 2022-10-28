@@ -1,6 +1,6 @@
 from django import forms
 
-from .models import Vendor, BankDetails, Person
+from app.contactor.models import Vendor, BankDetails, Person
 
 
 class PersonAddForm(forms.ModelForm):

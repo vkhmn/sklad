@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import BankDetails, Vendor, Person, Buyer
+from app.contactor.models import BankDetails, Vendor, Person, Buyer
 
 
 @admin.register(BankDetails)

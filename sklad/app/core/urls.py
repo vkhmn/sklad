@@ -1,7 +1,8 @@
 from django.urls import path
 
-from .views import LoginUser, logout_user
-from .views import ajax_view, search_result
+from app.core.views import (
+    LoginUser, logout_user, ajax_view, search_result
+)
 
 
 urlpatterns = [

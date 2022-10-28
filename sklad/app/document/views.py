@@ -6,17 +6,13 @@ from django.urls import reverse_lazy, reverse
 
 from app.core.mixin import DataMixin, SuperUserRequiredMixin
 from app.core.forms import SearchForm
-from .forms import DeliveryAddForm, DocumentNomenclaturesFormSet
-from .forms import ShipmentAddForm
-from .models import Document, Status
-from .services import (
-    get_documents_filter,
-    get_deliveries_filter,
-    get_shipments_filter,
-    DocumentContext,
-    DocumentAdd,
-    ConfirmDocument,
-    ChangeDocumentStatus
+from app.document.forms import (
+    DeliveryAddForm, DocumentNomenclaturesFormSet, ShipmentAddForm
+)
+from app.document.models import Document, Status
+from app.document.services import (
+    get_documents_filter, get_deliveries_filter, get_shipments_filter,
+    DocumentContext, DocumentAdd, ConfirmDocument, ChangeDocumentStatus
 )
 
 
@@ -27,7 +23,7 @@ class HomeView(LoginRequiredMixin, DataMixin, ListView):
     template_name = 'core/index.html'
     context_object_name = 'documents'
     login_url = reverse_lazy('login')
-    paginate_by = 3
+    paginate_by = 10
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -171,7 +167,7 @@ class ShipmentAddView(DocumentAddView):
         context = super().get_context_data(**kwargs)
         context.update(
             self.get_user_context(
-                title='Создание заяки отгрузку',
+                title='Создание заяки на отгрузку',
                 document_add_form=ShipmentAddForm(),
                 document_nomenclature_form_set=DocumentNomenclaturesFormSet()
             )

@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Nomenclature, Category, SubCategory, Store
+from app.nomenclature.models import Nomenclature, Category, SubCategory, Store
 
 
 @admin.register(Nomenclature)

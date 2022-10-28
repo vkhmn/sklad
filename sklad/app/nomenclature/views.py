@@ -4,12 +4,13 @@ from django.urls import reverse_lazy
 
 from app.core.mixin import SuperUserRequiredMixin, DataMixin
 from app.core.forms import SearchForm
-from .forms import NomenklatureAddForm
-from .models import Nomenclature
-from .services import get_subcats, get_nomenclatures_list, get_category_name
-
-from .services import get_nomenclatures_category, get_subcategory_name
-from .services import get_nomenclatures_subcategory, NomenclatureContext
+from app.nomenclature.forms import NomenklatureAddForm
+from app.nomenclature.models import Nomenclature
+from app.nomenclature.services import (
+    get_subcats, get_nomenclatures_list, get_category_name,
+    get_nomenclatures_category, get_subcategory_name,
+    get_nomenclatures_subcategory, NomenclatureContext
+)
 
 
 class NomenclatureListView(SuperUserRequiredMixin, DataMixin, ListView):

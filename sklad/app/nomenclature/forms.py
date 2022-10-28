@@ -1,6 +1,6 @@
 from django import forms
 
-from .models import Nomenclature
+from app.nomenclature.models import Nomenclature
 
 
 class NomenklatureAddForm(forms.ModelForm):

@@ -4,10 +4,9 @@ from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
 from django.http import JsonResponse
 
-
-from .forms import LoginUserForm
-from .mixin import DataMixin
-from ..nomenclature.models import Nomenclature
+from app.core.forms import LoginUserForm
+from app.core.mixin import DataMixin
+from app.nomenclature.models import Nomenclature
 
 
 class LoginUser(DataMixin, LoginView):

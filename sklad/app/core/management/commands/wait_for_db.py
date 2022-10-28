@@ -5,7 +5,7 @@ from django.core.management import BaseCommand
 
 
 class Command(BaseCommand):
-   """Django команда для ожидания готовности базы данных."""
+    """Django команда для ожидания готовности базы данных."""
 
     def handle(self, *args, **options):
         self.stdout.write('Ожидание подключения к базе данных...')

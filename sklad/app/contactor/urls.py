@@ -1,7 +1,9 @@
 from django.urls import path
 
-from .views import BuyerView, BuyerAddView, BuyerListView
-from .views import VendorView, VendorAddView, VendorListView
+from app.contactor.views import (
+    BuyerView, BuyerAddView, BuyerListView,
+    VendorView, VendorAddView, VendorListView
+)
 
 
 urlpatterns = [

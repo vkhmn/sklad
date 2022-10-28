@@ -3,36 +3,19 @@ from django.template.loader import render_to_string
 
 from config.celery import app
 from config.settings import EMAIL_HOST_USER
-from app.core.utils import get_confirm_url, make_qrcode
-from app.document.enums import messages
-from app.document.models import Document, Status
 
 
 @app.task
-def send_email_to_buyer(document_id, status):
-    user_email = Document.objects.get(pk=document_id).buyer.person.email
+def send_email_to_buyer(email, message):
+    print(message)
+    html_message = render_to_string('document/email.html', message)
+    subject = message.get('subject', '')
 
-    if not user_email:
-        raise ValueError('У покупателя нет email адреса')
-
-    context = dict()
-    try:
-        context['subject'] = messages[status]['subject']
-        context['message'] = messages[status]['message']
-    except KeyError:
-        print(f'Нет одного из ключей: {status}, subject, message')
-    else:
-        if status == Status.COLLECTED:
-            context['qrcode'] = make_qrcode(document_id)
-            context['url'] = get_confirm_url(document_id)
-
-        html_message = render_to_string('document/email.html', context)
-
-        send_mail(
-            context['subject'],
-            None,
-            EMAIL_HOST_USER,
-            [user_email],
-            fail_silently=False,
-            html_message=html_message
-        )
+    send_mail(
+        subject,
+        None,
+        EMAIL_HOST_USER,
+        [email],
+        fail_silently=False,
+        html_message=html_message
+    )

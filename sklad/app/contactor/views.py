@@ -3,10 +3,12 @@ from django.views.generic import ListView, DetailView, CreateView, TemplateView
 from django.urls import reverse_lazy
 from django.views.generic.edit import FormMixin
 
-from .forms import PersonAddForm, BankDetailsAddForm, VendorAddForm
-from .models import Buyer, Vendor
 from app.core.mixin import SuperUserRequiredMixin, DataMixin
-from .services import create_object, get_documents, create_vendor, get_buyers, get_vendors
+from app.contactor.forms import PersonAddForm, BankDetailsAddForm, VendorAddForm
+from app.contactor.models import Buyer, Vendor
+from app.contactor.services import (
+    create_object, get_documents, create_vendor, get_buyers, get_vendors
+)
 
 
 class BuyerAddView(SuperUserRequiredMixin, DataMixin, CreateView):

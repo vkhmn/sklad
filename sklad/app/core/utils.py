@@ -1,9 +1,13 @@
 from base64 import b64encode, b64decode
 from io import BytesIO
+from os import getenv
+
+from django.urls import reverse_lazy
+from config.settings import BASE_URL
 from qrcode import make
 
-SOLT = 'DF'
-ROOT_URL = 'http://127.0.0.1:8000/document/confirm/?code='
+
+SOLT = getenv('SOLT')
 
 
 def decode(code):
@@ -18,13 +22,14 @@ def encode(document_id):
 
 
 def get_confirm_url(document_id):
+    url = reverse_lazy('document_confirm')
     code = encode(document_id)
-    return f'{ROOT_URL}{code}'
+    return f'{BASE_URL}{url}?code={code}'
 
 
 def make_qrcode(document_id):
-    url = get_confirm_url(document_id)
-    img = make(url)
+    confirm_url = get_confirm_url(document_id)
+    img = make(confirm_url)
     img_byte_arr = BytesIO()
     img.save(img_byte_arr, 'png')
     res = img_byte_arr.getvalue()

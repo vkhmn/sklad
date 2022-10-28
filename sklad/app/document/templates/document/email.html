@@ -8,8 +8,8 @@
     <h1>{{ subject }}</h1>
     <p>{{ message|linebreaks }}</p>
     <br><br>
-    {% if url %}
-        <a href="{{ url }}">Подтвердить</a>
+    {% if confirm_url %}
+        <a href="{{ confirm_url }}">Подтвердить</a>
     {% endif %}
     {% if qrcode %}
         <img src="data:image/png;base64,{{ qrcode }}" width="100" height="100"/>

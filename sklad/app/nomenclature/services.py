@@ -1,6 +1,6 @@
 from django.db.models import Count, F, Q, Sum
 
-from .models import SubCategory, Nomenclature, Category, Store
+from app.nomenclature.models import SubCategory, Nomenclature, Category, Store
 
 
 class NomenclatureContext:

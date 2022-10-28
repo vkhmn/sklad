@@ -1,14 +1,18 @@
-from .models import Status
+from app.document.models import Status
 
-# Контент для тела письма покупателю.
+# Контекст для тела письма покупателю.
 messages = {
-    Status.COLLECTED: {
+    (Status.VALIDATING, Status.COLLECTED): {
         'subject': 'Заказ собран',
         'message': 'Ваш заказ собран!\n'
-                   'Отсканируйте qr код, и подтвердите получение заказа! '
+                   'Отсканируйте qr код, и подтвердите получение заказа!'
     },
-    Status.CANCELED: {
+    (Status.VALIDATING, Status.CANCELED): {
         'subject': 'Заказ отменен',
         'message': 'Нет товара на складе'
+    },
+    (Status.COLLECTED, Status.CANCELED): {
+        'subject': 'Заказ отменен',
+        'message': 'Истекло время хранения заказа!'
     }
 }

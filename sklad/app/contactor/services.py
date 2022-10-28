@@ -1,5 +1,5 @@
-from app.contactor.models import Buyer, Vendor
 from app.document.models import Document
+from app.contactor.models import Buyer, Vendor
 
 
 def get_documents(count=5, **fields):

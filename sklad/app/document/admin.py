@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import DocumentNomenclatures, Document
+from app.document.models import DocumentNomenclatures, Document
 
 
 @admin.register(Document)
