@@ -11,8 +11,8 @@ app.config_from_object('django.conf:settings')
 app.autodiscover_tasks()
 
 app.conf.beat_schedule = {
-    'check-documents-status-every-day (18.00)': {
+    'check-documents-status': {
         'task': 'app.document.tasks.task2.check_document_status',
-        'schedule': crontab(),
+        'schedule': crontab(minute=0),
     },
 }
