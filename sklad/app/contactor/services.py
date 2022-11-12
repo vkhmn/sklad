@@ -10,11 +10,13 @@ def get_documents(count=5, **fields):
 
 
 def get_buyers():
-    return Buyer.objects.select_related('person')
+    return Buyer.objects.select_related('person').order_by('person__full_name')
 
 
 def get_vendors():
-    return Vendor.objects.select_related('contact_person')
+    return Vendor.objects.select_related('contact_person').order_by(
+        'contact_person__full_name'
+    )
 
 
 def create_object(model, **fields):

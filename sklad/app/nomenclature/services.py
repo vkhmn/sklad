@@ -37,13 +37,17 @@ class NomenclatureContext:
 
 
 def get_subcats():
-    return SubCategory.objects.annotate(
+    return SubCategory.objects.select_related(
+        'category'
+    ).annotate(
         total=Count('nomenclature')).filter(
         total__gt=0).order_by('category__name', 'name')
 
 
 def get_nomenclatures_list(query):
-    return Nomenclature.objects.filter(name__icontains=query).annotate(
+    return Nomenclature.objects.select_related(
+        'subcategory', 'subcategory__category').filter(
+        name__icontains=query).annotate(
         store_amount=F('store__amount')).order_by(
         'subcategory__category__name',
         'subcategory__name',
@@ -52,7 +56,9 @@ def get_nomenclatures_list(query):
 
 
 def get_nomenclatures_category(pk, query):
-    return Nomenclature.objects.filter(
+    return Nomenclature.objects.select_related(
+        'subcategory', 'subcategory__category'
+    ).filter(
         subcategory__category=pk).filter(
         name__icontains=query).annotate(
         store_amount=F('store__amount')).order_by(
@@ -62,7 +68,9 @@ def get_nomenclatures_category(pk, query):
 
 
 def get_nomenclatures_subcategory(pk, query):
-    return Nomenclature.objects.filter(
+    return Nomenclature.objects.select_related(
+        'subcategory', 'subcategory__category'
+    ).filter(
         Q(subcategory=pk)).filter(
         Q(name__icontains=query)).annotate(
         store_amount=F('store__amount')).order_by('name')

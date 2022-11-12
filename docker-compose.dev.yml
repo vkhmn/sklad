@@ -1,0 +1,23 @@
+version: '3'
+ 
+services:
+  app:
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./sklad:/app
+    env_file:
+      - ./.env.dev
+
+  db:
+    env_file:
+      - ./.env.dev
+
+  celery:
+    command: pipenv run celery -A config worker --loglevel=debug --concurrency=4
+    env_file:
+      - ./.env.dev
+
+  celery_cron:
+    env_file:
+      - ./.env.dev

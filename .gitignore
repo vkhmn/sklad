@@ -1,6 +1,7 @@
 .idea/
 __pycache__/
 .env.dev
+.env.prod
 sklad/.env
 dump.rdb
 celerybeat-schedule

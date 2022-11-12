@@ -3,7 +3,7 @@ from io import BytesIO
 from os import getenv
 
 from django.urls import reverse_lazy
-from config.settings import BASE_URL
+from django.conf import settings
 from qrcode import make
 
 
@@ -24,7 +24,7 @@ def encode(document_id):
 def get_confirm_url(document_id):
     url = reverse_lazy('document_confirm')
     code = encode(document_id)
-    return f'{BASE_URL}{url}?code={code}'
+    return f'{settings.BASE_URL}{url}?code={code}'
 
 
 def make_qrcode(document_id):

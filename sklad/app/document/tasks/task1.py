@@ -2,7 +2,7 @@ from django.core.mail import send_mail
 from django.template.loader import render_to_string
 
 from config.celery import app
-from config.settings import EMAIL_HOST_USER
+from django.conf import settings
 
 
 @app.task
@@ -14,7 +14,7 @@ def send_email_to_buyer(email, message):
     send_mail(
         subject,
         None,
-        EMAIL_HOST_USER,
+        settings.EMAIL_HOST_USER,
         [email],
         fail_silently=False,
         html_message=html_message
