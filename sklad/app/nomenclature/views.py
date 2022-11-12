@@ -4,7 +4,7 @@ from django.urls import reverse_lazy
 
 from app.core.mixin import SuperUserRequiredMixin, DataMixin
 from app.core.forms import SearchForm
-from app.nomenclature.forms import NomenklatureAddForm
+from app.nomenclature.forms import NomenclatureAddForm
 from app.nomenclature.models import Nomenclature
 from app.nomenclature.services import (
     get_subcats, get_nomenclatures_list, get_category_name,
@@ -27,8 +27,9 @@ class NomenclatureListView(SuperUserRequiredMixin, DataMixin, ListView):
             self.get_user_context(
                 title='Номенклатура',
                 subcats=get_subcats(),
-                search_form=SearchForm(data=self.request.GET)
-            )
+                search_form=SearchForm(data=self.request.GET),
+                create_url='nomenclature_add',
+        )
         )
         return context
 
@@ -53,8 +54,9 @@ class CategoryBase(SuperUserRequiredMixin, DataMixin, ListView):
         context.update(
             self.get_user_context(
                 subcats=get_subcats(),
-                search_form=SearchForm(data=self.request.GET)
-            )
+                search_form=SearchForm(data=self.request.GET),
+                create_url='nomenclature_add',
+        )
         )
         return context
 
@@ -110,10 +112,10 @@ class NomenclatureView(SuperUserRequiredMixin, DataMixin, DetailView):
         return context
 
 
-class NomenklatureAddView(SuperUserRequiredMixin, DataMixin, CreateView):
+class NomenclatureAddView(SuperUserRequiredMixin, DataMixin, CreateView):
     """Представление для создания новой номенклатуры."""
 
-    form_class = NomenklatureAddForm
+    form_class = NomenclatureAddForm
     template_name = 'nomenclature/add.html'
     success_url = reverse_lazy('nomenclature_list')
 

@@ -3,7 +3,7 @@ from django import forms
 from app.nomenclature.models import Nomenclature
 
 
-class NomenklatureAddForm(forms.ModelForm):
+class NomenclatureAddForm(forms.ModelForm):
     class Meta:
         model = Nomenclature
         fields = ['name', 'article', 'price', 'subcategory']

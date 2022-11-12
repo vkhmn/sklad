@@ -1,7 +1,7 @@
 from django.urls import path
 
 from app.nomenclature.views import (
-    NomenclatureView, NomenclatureListView, NomenklatureAddView,
+    NomenclatureView, NomenclatureListView, NomenclatureAddView,
     CategoryView, SubCategoryView
 )
 
@@ -9,8 +9,8 @@ from app.nomenclature.views import (
 urlpatterns = [
     path('nomenclature/', NomenclatureListView.as_view(),
          name='nomenclature_list'),
-    path('nomenclature/add/', NomenklatureAddView.as_view(),
-         name='nomenklature_add'),
+    path('nomenclature/add/', NomenclatureAddView.as_view(),
+         name='nomenclature_add'),
     path('nomenclature/<int:pk>/', NomenclatureView.as_view(),
          name='nomenclature'),
     path('category/<int:pk>/', CategoryView.as_view(), name='category'),
