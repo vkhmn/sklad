@@ -5,8 +5,9 @@ services:
     ports:
       - "8000:8000"
     command: >
-      sh -c "pipenv run python3 manage.py migrate &&
-             pipenv run python3 manage.py wait_for_db &&
+      sh -c "pipenv run python3 manage.py wait_for_db &&
+             pipenv run python3 manage.py migrate &&
+             pipenv run python3 manage.py init_db &&
              pipenv run python3 manage.py runserver 0.0.0.0:8000"
     volumes:
       - ./sklad:/app

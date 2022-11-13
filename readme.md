@@ -25,8 +25,9 @@
 
 # Порядок установки
 - Склонировать репозиторий.
-- Устнановить свои значения в файлах: .env.dev, sklad/.env
-- Развернуть проект в Docker: docker-compose up -d
-- Создать суперпользователя Django. Войти в Docker контейнер с запущенным приложением Django (docker exec -it 'contaner_id' sh) и выполнить команду (python manage.py createsuperuser).
+- Устнановить свои значения в файлах: .env.dev (.env.prod), sklad/.env
+- Развернуть проект в Docker для среды Production (docker-compose up -d), для среды Development: docker-compose -f docker-compose.yml -f docker-compose.dev.yml up -d
 
-По умолчанию проект доступен по адресу: http://127.0.0.1:8000/
+По умолчанию проект для среды Development доступен по адресу: http://127.0.0.1:8000/
+
+Тестовые учетные данные: (root, 12345), (sklad, 12345)

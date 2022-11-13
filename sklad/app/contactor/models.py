@@ -9,7 +9,7 @@ class Person(models.Model):
 
     full_name = models.CharField('Фамилия Имя Отчество', max_length=100)
     email = models.EmailField('Email', unique=True)
-    phone = models.IntegerField('Телефон', unique=True)
+    phone = models.BigIntegerField('Телефон', unique=True)
 
     def __str__(self):
         return self.full_name
