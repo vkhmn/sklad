@@ -7,8 +7,7 @@ class Command(BaseCommand):
     """Django команда для загрузки тестовых данных в базу данных."""
 
     def handle(self, *args, **options):
-        self.stdout.write('Загрузка данных в базу данных...')
         if not User.objects.exists():
+            self.stdout.write('Загрузка данных в базу данных...')
             call_command('loaddata', 'db.json')
-
-        self.stdout.write(self.style.SUCCESS('Загрузка данных завершена!'))
+            self.stdout.write(self.style.SUCCESS('Загрузка данных завершена!'))

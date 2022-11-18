@@ -86,5 +86,5 @@ class Store(models.Model):
 
 
 @receiver(post_save, sender=Nomenclature)
-def update_stock(sender, instance, **kwargs):
+def update_store(sender, instance, **kwargs):
     Store.objects.create(nomenclature=instance)
