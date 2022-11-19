@@ -1,3 +1,4 @@
+from dal import autocomplete
 from django import forms
 
 from app.contactor.models import Vendor, BankDetails, Person
@@ -21,7 +22,9 @@ class VendorAddForm(forms.ModelForm):
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-control'}),
             'address': forms.TextInput(attrs={'class': 'form-control'}),
-            'categories': forms.SelectMultiple(attrs={'class': 'form-control'}),
+            'categories': autocomplete.ModelSelect2Multiple(
+                'autocomplete_category', attrs={'class': 'form-control'}
+            ),
         }
 
 

@@ -19,8 +19,12 @@ INSTALLED_APPS = [
     'app.contactor.apps.ContactorConfig',
     'app.document.apps.DocumentConfig',
     'app.nomenclature.apps.NomenclatureConfig',
+    'app.autocomplete.apps.AutocompleteConfig',
     'bootstrap4',
+    'dal',
+    'dal_select2',
 ]
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

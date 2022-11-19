@@ -1,7 +1,13 @@
 {% extends 'core/base.html' %}
+{% load static %}
 
 
 {% block content %}
+    <style>
+        .select2-container .select2-selection--multiple {
+            height: 150px;
+        }
+    </style>
     <h3>{{ title }}</h3>
     <br><br>
     <form method="post">
@@ -10,7 +16,7 @@
         {% for f in vendor_form %}
             <div class="form-group row">
                 <label class="col-md-3 col-form-label form-control-label text-muted" for="{{ f.id_for_label }}">{{ f.label }}</label>
-                <div class="col-lg-4">{{ f }}</div>
+                <div class="col-lg-5">{{ f }}</div>
                 <div class="text-danger">{{ f.errors }}</div>
             </div>
         {% endfor %}
@@ -20,7 +26,7 @@
         {% for f in contact_person_form %}
             <div class="form-group row">
                 <label class="col-md-3 col-form-label form-control-label text-muted" for="{{ f.id_for_label }}">{{ f.label }}</label>
-                <div class="col-lg-4">{{ f }}</div>
+                <div class="col-lg-5">{{ f }}</div>
                 <div class="text-danger">{{ f.errors }}</div>
             </div>
         {% endfor %}
@@ -30,7 +36,7 @@
         {% for f in bank_details_form %}
             <div class="form-group row">
                 <label class="col-md-3 col-form-label form-control-label text-muted" for="{{ f.id_for_label }}">{{ f.label }}</label>
-                <div class="col-lg-4">{{ f }}</div>
+                <div class="col-lg-5">{{ f }}</div>
                 <div class="text-danger">{{ f.errors }}</div>
             </div>
         {% endfor %}
@@ -38,4 +44,9 @@
         <button type="submit" class="btn btn-success">Добавить</button>
     </form>
 
+{% endblock %}
+
+{% block footer %}
+    <script type="text/javascript" src="{% static 'admin/js/vendor/jquery/jquery.js' %}"></script>
+    {{ vendor_form.media }}
 {% endblock %}

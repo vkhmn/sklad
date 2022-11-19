@@ -1,63 +1,103 @@
 {% extends 'core/base.html' %}
+{% load static %}
 
 {% block content %}
+    <style>
+    .select2-container .select2-selection--single {
+        height: calc(1.5em + 0.75rem + 2px) !important;
+    }
+    </style>
     <h3>{{ title }}</h3>
     <br><br>
-    <form id="form-container" method="post">
+<div>
+    <form action="" method="post">
         {% csrf_token %}
         <div class="text-danger">{{ document_add_form.non_field_errors }}</div>
-        <div class="form-group row">
-            <label class="col-lg-2 col-form-label form-control-label text-muted" for="{{ document_add_form.contactor.id_for_label }}">
-                {{ document_add_form.contactor.label }}
-            </label>
-            <div class="col-lg-2">{{ document_add_form.contactor }}</div>
-            <div class="text-danger">{{ document_add_form.contactor.errors }}</div>
-        </div>
 
-        {{ document_nomenclature_form_set.management_form }}
-        {% for form in document_nomenclature_form_set %}
-            <div class="text-danger">{{ form.non_field_errors }}</div>
-            <div class="nomenclature-form">
-                <div class="form-group row">
-	                <label class="col-md-2 col-form-label form-control-label text-muted">{{ form.nomenclature.label }}</label>
-	                <div class="col-lg-2">
-		                {{ form.nomenclature }}
-	                </div>
-                    <div class="text-danger">{{ form.nomenclature.errors }}</div>
-                    <div class="col-md-1">
-		                {{ form.amount }}
-                    </div>
-                    <div class="text-danger">{{ form.amount.errors }}</div>
-                </div>
+        <table>
+        <tr>
+            <td width="150px">
+                <label class="col-lg-2 col-form-label form-control-label text-muted" for="{{ document_add_form.contactor.id_for_label }}">
+                    {{ document_add_form.contactor.label }}
+                </label>
+            </td>
+            <td width="300px">{{ document_add_form.contactor }}</td>
+            <td width="70px"></td>
+        </tr>
+            <tr>
+                <td></td>
+                <td><div class="text-danger">{{ document_add_form.contactor.errors }}</div></td>
+                <td></td>
+            </tr>
+        </table>
+
+    <div id="empty_form" style="display:none">
+                <table>
+                    <tr>
+                        <td width="150px">
+	                <label class="col-md-2 col-form-label form-control-label text-muted">
+                        {{ document_nomenclature_form_set.empty_form.nomenclature.label }}
+                    </label>
+                            </td><td width="300">
+                        {{ document_nomenclature_form_set.empty_form.nomenclature }}
+                    </td>
+                    <td width="70">
+                        {{ document_nomenclature_form_set.empty_form.amount }}
+                    </td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td><div class="text-danger">{{ document_nomenclature_form_set.empty_form.nomenclature.errors }}</div></td>
+                        <td><div class="text-danger">{{ document_nomenclature_form_set.empty_form.amount.errors }}</div></td>
+                    </tr>
+                </table>
             </div>
-        {% endfor %}
 
-        <button id="add-form" type="button" class="btn btn-secondary">Добавить номенклатуру</button>
+        <div id="form_set">
+            {{ document_nomenclature_form_set.management_form }}
+            {% for form in document_nomenclature_form_set %}
+            <div class="text-danger">{{ form.non_field_errors }}</div>
+            <table>
+                <tr>
+                    <td width="150px">
+	                <label class="col-md-2 col-form-label form-control-label text-muted">
+                        {{ form.nomenclature.label }}
+                    </label></td><td width="300px">
+		                {{ form.nomenclature }}
+                    </td><td width="70px">
+		                {{ form.amount }}
+                    </td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td><div class="text-danger">{{ form.nomenclature.errors }}</div></td>
+                    <td><div class="text-danger">{{ form.amount.errors }}</div></td>
+                </tr>
+            </table>
+
+            {% endfor %}
+
+
+        </div><br>
+        <button id="add_form" type="button" class="btn btn-secondary">Добавить номенклатуру</button>
         <button type="submit"  class="btn btn-success">Создать заявку</button>
     </form>
+</div>
+{% endblock %}
 
+{% block footer %}
+<script type="text/javascript" src="{% static 'admin/js/vendor/jquery/jquery.js' %}"></script>
 
-    <script>
-        let nomenclatureForm = document.querySelectorAll(".nomenclature-form")
-        let container = document.querySelector("#form-container")
-        let addButton = document.querySelector("#add-form")
-        let totalForms = document.querySelector("#id_form-TOTAL_FORMS")
-
-        let formNum = nomenclatureForm.length-1
-        addButton.addEventListener('click', addForm)
-
-        function addForm(e){
-            e.preventDefault()
-
-            let newForm = nomenclatureForm[0].cloneNode(true)
-            let formRegex = RegExp(`form-(\\d){1}-`,'g')
-
-            formNum++
-            newForm.innerHTML = newForm.innerHTML.replace(formRegex, `form-${formNum}-`)
-            container.insertBefore(newForm, addButton)
-
-            totalForms.setAttribute('value', `${formNum+1}`)
-        }
-    </script>
-
+{{ document_nomenclature_form_set.media }}
+<script>
+    $('#add_form').click(function() {
+        console.log(1)
+        var form_idx = $('#id_form-TOTAL_FORMS').val();
+        console.log(2)
+        $('#form_set').append($('#empty_form').html().replace(/__prefix__/g, form_idx));
+        console.log(3)
+        $('#id_form-TOTAL_FORMS').val(parseInt(form_idx) + 1);
+        console.log(4)
+    });
+</script>
 {% endblock %}

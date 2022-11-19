@@ -1,3 +1,4 @@
+from dal import autocomplete
 from django import forms
 from django.forms import formset_factory
 
@@ -9,7 +10,8 @@ class DeliveryAddForm(forms.Form):
     contactor = forms.ModelChoiceField(
         queryset=Vendor.objects.all(),
         label='Поставщик',
-        widget=forms.Select(
+        widget=autocomplete.ModelSelect2(
+            'autocomplete_vendor',
             attrs={'class': 'form-control'}
         )
     )
@@ -19,7 +21,8 @@ class ShipmentAddForm(forms.Form):
     contactor = forms.ModelChoiceField(
         queryset=Buyer.objects.select_related('person'),
         label='Покупатель',
-        widget=forms.Select(
+        widget=autocomplete.ModelSelect2(
+            'autocomplete_buyer',
             attrs={'class': 'form-control'}
         )
     )
@@ -29,7 +32,8 @@ class DocumentNomenclaturesAddForm(forms.Form):
     nomenclature = forms.ModelChoiceField(
         queryset=Nomenclature.objects.all().order_by('name'),
         label='Номенклатура',
-        widget=forms.Select(
+        widget=autocomplete.ModelSelect2(
+            'autocomplete_nomenclature',
             attrs={'class': 'form-control'}
         )
     )

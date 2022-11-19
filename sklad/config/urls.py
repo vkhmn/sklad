@@ -9,6 +9,7 @@ urlpatterns = [
     path('', include('app.document.urls')),
     path('', include('app.contactor.urls')),
     path('', include('app.core.urls')),
+    path('', include('app.autocomplete.urls')),
 ]
 
 if settings.DEBUG:
