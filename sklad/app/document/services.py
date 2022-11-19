@@ -138,7 +138,7 @@ class ConfirmDocument:
         document = cls._get_document_or_404(code)
         if change_status:
             ChangeDocumentStatus.execute(document, Status.FINISHED)
-        return dict(document_id=document.pk)
+        return dict(document_id=document.number)
 
 
 class ChangeDocumentStatus:

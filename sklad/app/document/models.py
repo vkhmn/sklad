@@ -57,7 +57,11 @@ class Document(models.Model):
         if not (self.buyer or self.vendor):
             document_type = 'None'
 
-        return f'{document_type} № {self.pk}'
+        return f'{document_type} № {self.number}'
+
+    @property
+    def number(self):
+        return f'{self.pk:06d}'
 
 
 class DocumentNomenclatures(models.Model):

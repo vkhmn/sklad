@@ -27,11 +27,11 @@
                 <th scope="row"></th>
                 {% if d.buyer %}
                     <td>Отгрузка</td>
-                    <td><a href="{{ d.get_absolute_url }}">{{ d.pk }}</a></td>
+                    <td><a href="{{ d.get_absolute_url }}">{{ d.number }}</a></td>
                     <td>{{ d.buyer }}</td>
                 {% elif d.vendor %}
                     <td>Поставка</td>
-                    <td><a href="{{ d.get_absolute_url }}">{{ d.pk }}</a></td>
+                    <td><a href="{{ d.get_absolute_url }}">{{ d.number }}</a></td>
                     <td>{{ d.vendor }}</td>
                 {% endif %}
                 <td><a href="{{ request.url }}?{% query_transform request status=d.status %}">

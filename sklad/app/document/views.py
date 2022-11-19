@@ -106,7 +106,7 @@ class DocumentAddView(SuperUserRequiredMixin, DataMixin, TemplateView):
     contactor = None
 
     def form_invalid(self, form):
-        """If the form is invalid, render the invalid form."""
+        """Если форма не валидна, то вывести контекст для формы."""
         contex = self.get_context_data()
         contex.update(form)
         return self.render_to_response(contex)
@@ -119,7 +119,7 @@ class DocumentAddView(SuperUserRequiredMixin, DataMixin, TemplateView):
             ),
         }
         forms.update(kwargs)
-        # Validate forms
+        # Проверка формы на валидность
         for form in forms.values():
             if not form.is_valid():
                 return self.form_invalid(forms)
