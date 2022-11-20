@@ -1,4 +1,6 @@
 from django.db import models
+from django.db.models.signals import post_delete
+from django.dispatch import receiver
 from django.urls import reverse
 
 from app.nomenclature.models import Category
@@ -82,3 +84,16 @@ class Vendor(models.Model):
         verbose_name = 'Поставщик'
         verbose_name_plural = 'Поставщики'
 
+
+@receiver(post_delete, sender=Vendor)
+def post_delete_vendor(sender, instance, *args, **kwargs):
+    if instance.contact_person:
+        instance.contact_person.delete()
+    if instance.bank_details:
+        instance.bank_details.delete()
+
+
+@receiver(post_delete, sender=Buyer)
+def post_delete_buyer(sender, instance, *args, **kwargs):
+    if instance.person:
+        instance.person.delete()
