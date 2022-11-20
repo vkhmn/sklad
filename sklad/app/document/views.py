@@ -12,7 +12,8 @@ from app.document.forms import (
 from app.document.models import Document, Status
 from app.document.services import (
     get_documents_filter, get_deliveries_filter, get_shipments_filter,
-    DocumentContext, DocumentAdd, ConfirmDocument, ChangeDocumentStatus
+    DocumentContext, DocumentAdd, ConfirmDocument, ChangeDocumentStatus,
+    get_documents_status
 )
 
 
@@ -29,14 +30,15 @@ class HomeView(LoginRequiredMixin, ListView):
         context = super().get_context_data(**kwargs)
         context.update(
             title='Заявки на поставку/отгрузку',
-            search_form=SearchForm(data=self.request.GET)
+            search_form=SearchForm(data=self.request.GET),
+            st=get_documents_status(*self.get_params())
         )
         return context
 
     def get_params(self):
         query = self.request.GET.get('search', '')
         status = self.request.GET.get('status')
-        status = (status, ) if status else Status
+        status = status.split(',') if status else Status
         return query, status
 
     def get_queryset(self):
@@ -51,6 +53,7 @@ class DeliveryListView(SuperUserRequiredMixin, HomeView):
         context.update(
             title='Заявки на поставку',
             create_url='delivery_add',
+            st=get_documents_status(*self.get_params(), document='delivery')
         )
         return context
 
@@ -66,6 +69,7 @@ class ShipmentListView(SuperUserRequiredMixin, HomeView):
         context.update(
             title='Заявки на отгрузку',
             create_url='shipment_add',
+            st=get_documents_status(*self.get_params(), document='shipment')
         )
         return context
 

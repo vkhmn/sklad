@@ -1,5 +1,30 @@
 {% load document_tags %}
 
+{% block filter %}
+<table border="0" width="100%">
+    <tr>
+        <td align="right">
+        {% if st %}
+            <label class="col-md-2 col-form-label form-control-label">Статус</label>
+        {% endif %}
+    {% if request.GET.status %}
+        {% for k, v in st.items %}
+            {% if k in request.GET.status %}
+                <button type="submit" class="btn btn-primary btn-sm" onclick="location.href='{{ request.path }}?{% status_sub request st.keys k %}'">{{ v }}</button>
+            {% else %}
+                <button type="submit" class="btn btn-outline-primary btn-sm" onclick="location.href='{{ request.path }}?{% status_add request st.keys k %}'">{{ v }}</button>
+            {% endif %}
+        {% endfor %}
+    {% else %}
+       {% for k, v in st.items %}
+            <button type="submit" class="btn btn-primary btn-sm" onclick="location.href='{{ request.path }}?{% status_sub request st.keys k %}'">{{ v }}</button>
+        {% endfor %}
+    {% endif %}
+        </td>
+    </tr>
+</table><br>
+{% endblock %}
+
 <table class="table">
     <thead>
     <tr class="table-secondary">
@@ -34,7 +59,7 @@
                     <td><a href="{{ d.get_absolute_url }}">{{ d.number }}</a></td>
                     <td>{{ d.vendor }}</td>
                 {% endif %}
-                <td><a href="{{ request.url }}?{% query_transform request status=d.status %}">
+                <td><a href="{{ request.path }}?{% query_transform request status=d.status %}">
                     {{ d.get_status_display }}</a></td>
                 <td>{{ d.time_create|date:"d-m-Y H:i:s" }}</td>
             </tr>

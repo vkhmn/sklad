@@ -5,12 +5,24 @@ from django.core.exceptions import ValidationError
 from django.db.models import Sum, F, Min, Q
 from django.http import Http404
 from django.shortcuts import get_object_or_404
-
 from app.document.models import Document, DocumentNomenclatures, Status
 from app.document.enums import messages
 from app.document.tasks.task1 import send_email_to_buyer
 from app.nomenclature.models import Store
 from app.core.utils import decode, make_qrcode, get_confirm_url
+
+
+def get_documents_status(query, status, document='all'):
+    filters = {
+        'delivery': Q(vendor__isnull=False) & Q(vendor__name__icontains=query),
+        'shipment': Q(buyer__isnull=False) & Q(buyer__person__full_name__icontains=query),
+        'all': Q(buyer__person__full_name__icontains=query) | Q(vendor__name__icontains=query)
+    }.get(document)
+
+    qs = Document.objects.filter(
+        filters
+    ).values_list('status', flat=True).distinct('status')
+    return {s.value: s.label for s in Status if s in qs}
 
 
 def get_documents_filter(query, status):
