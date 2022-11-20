@@ -4,7 +4,7 @@ from django.views.generic import ListView, DetailView, TemplateView
 from django.urls import reverse_lazy, reverse
 
 
-from app.core.mixin import DataMixin, SuperUserRequiredMixin
+from app.core.mixin import SuperUserRequiredMixin
 from app.core.forms import SearchForm
 from app.document.forms import (
     DeliveryAddForm, DocumentNomenclaturesFormSet, ShipmentAddForm
@@ -16,7 +16,7 @@ from app.document.services import (
 )
 
 
-class HomeView(LoginRequiredMixin, DataMixin, ListView):
+class HomeView(LoginRequiredMixin, ListView):
     """Представление для главной страницы."""
 
     model = Document
@@ -28,10 +28,8 @@ class HomeView(LoginRequiredMixin, DataMixin, ListView):
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update(
-            self.get_user_context(
-                title='Заявки на поставку/отгрузку',
-                search_form=SearchForm(data=self.request.GET)
-            )
+            title='Заявки на поставку/отгрузку',
+            search_form=SearchForm(data=self.request.GET)
         )
         return context
 
@@ -51,10 +49,8 @@ class DeliveryListView(SuperUserRequiredMixin, HomeView):
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update(
-            self.get_user_context(
-                title='Заявки на поставку',
-                create_url='delivery_add',
-            )
+            title='Заявки на поставку',
+            create_url='delivery_add',
         )
         return context
 
@@ -68,10 +64,8 @@ class ShipmentListView(SuperUserRequiredMixin, HomeView):
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update(
-            self.get_user_context(
-                title='Заявки на отгрузку',
-                create_url='shipment_add',
-            )
+            title='Заявки на отгрузку',
+            create_url='shipment_add',
         )
         return context
 
@@ -79,7 +73,7 @@ class ShipmentListView(SuperUserRequiredMixin, HomeView):
         return get_shipments_filter(*self.get_params())
 
 
-class DocumentView(LoginRequiredMixin, DataMixin, DetailView):
+class DocumentView(LoginRequiredMixin, DetailView):
     """Представление для отображения деталей документа."""
 
     model = Document
@@ -90,15 +84,13 @@ class DocumentView(LoginRequiredMixin, DataMixin, DetailView):
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update(
-            self.get_user_context(
-                title='Информация по заявке',
-                **DocumentContext.execute(self.object)
-            )
+            title='Информация по заявке',
+            **DocumentContext.execute(self.object)
         )
         return context
 
 
-class DocumentAddView(SuperUserRequiredMixin, DataMixin, TemplateView):
+class DocumentAddView(SuperUserRequiredMixin, TemplateView):
     """Базовый класс представления для создания документа."""
 
     template_name = 'document/add.html'
@@ -142,11 +134,9 @@ class DeliveryAddView(DocumentAddView):
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update(
-            self.get_user_context(
-                title='Создание заяки на поставку',
-                document_add_form=DeliveryAddForm(),
-                document_nomenclature_form_set=DocumentNomenclaturesFormSet()
-            )
+            title='Создание заяки на поставку',
+            document_add_form=DeliveryAddForm(),
+            document_nomenclature_form_set=DocumentNomenclaturesFormSet()
         )
         return context
 
@@ -166,11 +156,9 @@ class ShipmentAddView(DocumentAddView):
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update(
-            self.get_user_context(
-                title='Создание заяки на отгрузку',
-                document_add_form=ShipmentAddForm(),
-                document_nomenclature_form_set=DocumentNomenclaturesFormSet()
-            )
+            title='Создание заяки на отгрузку',
+            document_add_form=ShipmentAddForm(),
+            document_nomenclature_form_set=DocumentNomenclaturesFormSet()
         )
         return context
 
@@ -181,7 +169,7 @@ class ShipmentAddView(DocumentAddView):
         return super().post(request, *args, **kwargs)
 
 
-class ConfirmView(DataMixin, TemplateView):
+class ConfirmView(TemplateView):
     """Отображение для подтвеждения получения товара покупателем."""
 
     template_name = 'document/confirm.html'
@@ -190,7 +178,7 @@ class ConfirmView(DataMixin, TemplateView):
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update(
-            self.get_user_context(title="Подтвеждение получения товара")
+            title="Подтвеждение получения товара"
         )
         return context
 
@@ -217,7 +205,7 @@ class ChangeDocumentStatusView(DocumentView):
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update(
-            self.get_user_context(title="Информация по заявке")
+            title="Информация по заявке"
         )
         return context
 

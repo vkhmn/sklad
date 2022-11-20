@@ -3,7 +3,7 @@ from django.views.generic import ListView, DetailView, CreateView, TemplateView
 from django.urls import reverse_lazy
 from django.views.generic.edit import FormMixin
 
-from app.core.mixin import SuperUserRequiredMixin, DataMixin
+from app.core.mixin import SuperUserRequiredMixin
 from app.contactor.forms import PersonAddForm, BankDetailsAddForm, VendorAddForm
 from app.contactor.models import Buyer, Vendor
 from app.contactor.services import (
@@ -11,7 +11,7 @@ from app.contactor.services import (
 )
 
 
-class BuyerAddView(SuperUserRequiredMixin, DataMixin, CreateView):
+class BuyerAddView(SuperUserRequiredMixin, CreateView):
     """Представление для добавления нового покупателя."""
 
     model = Buyer
@@ -22,9 +22,7 @@ class BuyerAddView(SuperUserRequiredMixin, DataMixin, CreateView):
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update(
-            self.get_user_context(
-                title='Создание покупателя'
-            )
+            title='Создание покупателя'
         )
         return context
 
@@ -35,7 +33,7 @@ class BuyerAddView(SuperUserRequiredMixin, DataMixin, CreateView):
         return FormMixin.form_valid(self, form)
 
 
-class BuyerListView(SuperUserRequiredMixin, DataMixin, ListView):
+class BuyerListView(SuperUserRequiredMixin, ListView):
     """Представление для отображения списка покупателей."""
 
     model = Buyer
@@ -46,10 +44,8 @@ class BuyerListView(SuperUserRequiredMixin, DataMixin, ListView):
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update(
-            self.get_user_context(
-                title='Покупатели',
-                create_url='buyer_add'
-            )
+            title='Покупатели',
+            create_url='buyer_add'
         )
         return context
 
@@ -57,7 +53,7 @@ class BuyerListView(SuperUserRequiredMixin, DataMixin, ListView):
         return get_buyers()
 
 
-class BuyerView(SuperUserRequiredMixin, DataMixin, DetailView):
+class BuyerView(SuperUserRequiredMixin, DetailView):
     """Представление для отображения детальной информации о покупателе."""
 
     model = Buyer
@@ -67,15 +63,13 @@ class BuyerView(SuperUserRequiredMixin, DataMixin, DetailView):
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update(
-            self.get_user_context(
-                title='Сведения о покупателе',
-                documents=get_documents(buyer=self.object, count=10)
-            )
+            title='Сведения о покупателе',
+            documents=get_documents(buyer=self.object, count=10)
         )
         return context
 
 
-class VendorAddView(SuperUserRequiredMixin, DataMixin, TemplateView):
+class VendorAddView(SuperUserRequiredMixin, TemplateView):
     """Отображение для добавления нового поставщика."""
 
     template_name = 'contactor/vendor_add.html'
@@ -84,12 +78,10 @@ class VendorAddView(SuperUserRequiredMixin, DataMixin, TemplateView):
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update(
-            self.get_user_context(
-                title='Создание поставщика',
-                bank_details_form=BankDetailsAddForm(),
-                vendor_form=VendorAddForm(),
-                contact_person_form=PersonAddForm()
-            )
+            title='Создание поставщика',
+            bank_details_form=BankDetailsAddForm(),
+            vendor_form=VendorAddForm(),
+            contact_person_form=PersonAddForm()
         )
         return context
 
@@ -115,7 +107,7 @@ class VendorAddView(SuperUserRequiredMixin, DataMixin, TemplateView):
         return redirect(self.success_url)
 
 
-class VendorListView(SuperUserRequiredMixin, DataMixin, ListView):
+class VendorListView(SuperUserRequiredMixin, ListView):
     """Отображение для списка поставщиков."""
 
     model = Vendor
@@ -126,10 +118,8 @@ class VendorListView(SuperUserRequiredMixin, DataMixin, ListView):
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update(
-            self.get_user_context(
-                title='Поставщики',
-                create_url='vendor_add',
-            )
+            title='Поставщики',
+            create_url='vendor_add',
         )
         return context
 
@@ -137,7 +127,7 @@ class VendorListView(SuperUserRequiredMixin, DataMixin, ListView):
         return get_vendors()
 
 
-class VendorView(SuperUserRequiredMixin, DataMixin, DetailView):
+class VendorView(SuperUserRequiredMixin, DetailView):
     """Отображение для деталей поставщика и его последних документов."""
 
     model = Vendor
@@ -147,9 +137,7 @@ class VendorView(SuperUserRequiredMixin, DataMixin, DetailView):
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update(
-            self.get_user_context(
-                title='Сведения о поставщике',
-                documents=get_documents(vendor=self.object, count=10)
-            )
+            title='Сведения о поставщике',
+            documents=get_documents(vendor=self.object, count=10)
         )
         return context

@@ -2,7 +2,7 @@ from django.views.generic import ListView, DetailView, CreateView
 from django.urls import reverse_lazy
 
 
-from app.core.mixin import SuperUserRequiredMixin, DataMixin
+from app.core.mixin import SuperUserRequiredMixin
 from app.core.forms import SearchForm
 from app.nomenclature.forms import NomenclatureAddForm
 from app.nomenclature.models import Nomenclature
@@ -13,7 +13,7 @@ from app.nomenclature.services import (
 )
 
 
-class NomenclatureListView(SuperUserRequiredMixin, DataMixin, ListView):
+class NomenclatureListView(SuperUserRequiredMixin, ListView):
     """Представление для отображения списка номеклатуры."""
 
     model = Nomenclature
@@ -24,12 +24,10 @@ class NomenclatureListView(SuperUserRequiredMixin, DataMixin, ListView):
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update(
-            self.get_user_context(
-                title='Номенклатура',
-                subcats=get_subcats(),
-                search_form=SearchForm(data=self.request.GET),
-                create_url='nomenclature_add',
-        )
+            title='Номенклатура',
+            subcats=get_subcats(),
+            search_form=SearchForm(data=self.request.GET),
+            create_url='nomenclature_add',
         )
         return context
 
@@ -38,7 +36,7 @@ class NomenclatureListView(SuperUserRequiredMixin, DataMixin, ListView):
         return get_nomenclatures_list(query)
 
 
-class CategoryBase(SuperUserRequiredMixin, DataMixin, ListView):
+class CategoryBase(SuperUserRequiredMixin, ListView):
     """
     Базовый класс представления
     для отображения номеклатуры в зависимости от категории.
@@ -52,11 +50,9 @@ class CategoryBase(SuperUserRequiredMixin, DataMixin, ListView):
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update(
-            self.get_user_context(
-                subcats=get_subcats(),
-                search_form=SearchForm(data=self.request.GET),
-                create_url='nomenclature_add',
-        )
+            subcats=get_subcats(),
+            search_form=SearchForm(data=self.request.GET),
+            create_url='nomenclature_add',
         )
         return context
 
@@ -95,7 +91,7 @@ class SubCategoryView(CategoryBase):
         )
 
 
-class NomenclatureView(SuperUserRequiredMixin, DataMixin, DetailView):
+class NomenclatureView(SuperUserRequiredMixin, DetailView):
     """Представление для отображения деталей номенклатуры."""
 
     model = Nomenclature
@@ -105,14 +101,12 @@ class NomenclatureView(SuperUserRequiredMixin, DataMixin, DetailView):
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update(
-            self.get_user_context(
-                **NomenclatureContext.execute(self.object)
-            )
+            **NomenclatureContext.execute(self.object)
         )
         return context
 
 
-class NomenclatureAddView(SuperUserRequiredMixin, DataMixin, CreateView):
+class NomenclatureAddView(SuperUserRequiredMixin, CreateView):
     """Представление для создания новой номенклатуры."""
 
     form_class = NomenclatureAddForm
@@ -122,8 +116,6 @@ class NomenclatureAddView(SuperUserRequiredMixin, DataMixin, CreateView):
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update(
-            self.get_user_context(
-                title='Добавление номенклатуры'
-            )
+            title='Добавление номенклатуры'
         )
         return context
