@@ -1,17 +1,34 @@
 <h3>Заявка на поставку</h3>
 <br><br>
-<div class="form-group row">
-    <div class="col-md-3 col-form-label form-control-label text-muted">Номер заявки</div>
-    <div class="col-md-3 col-form-label form-control-label" >{{ document.number }}</div>
-</div>
-<div class="form-group row">
-    <div class="col-md-3 col-form-label form-control-label text-muted">Дата</div>
-    <div class="col-md-3 col-form-label form-control-label" >{{ document.time_create|date:"d-m-Y H:i:s" }}</div>
-</div>
-<div class="form-group row">
-    <div class="col-md-3 col-form-label form-control-label text-muted">Поставщик</div>
-    <div class="col-md-3 col-form-label form-control-label" >{{ document.vendor.name }}</div>
-</div>
+<table class="table-content" border="0" width="100%">
+    <tr>
+        <td class="content-text" width="20%" height="50">
+            Номер заявки
+        </td>
+        <td class="content-text" width="40%">
+            {{ document.number }}
+        </td>
+        <td class="content-text" width="40%" rowspan="3">
+        </td>
+    </tr>
+    <tr>
+        <td class="content-text" height="50" >
+            Дата
+        </td>
+        <td class="content-text" >
+            {{ document.time_create|date:"d-m-Y H:i:s" }}
+        </td>
+    </tr>
+    <tr>
+        <td class="content-text" height="50">
+            Поставщик
+        </td>
+        <td class="content-text" >
+            {{ document.vendor.name }}
+        </td>
+    </tr>
+</table>
+<br>
 <table class="table">
     <thead>
     <tr class="table-secondary">
@@ -45,7 +62,7 @@
 </table>
 
 <div class="form-group row">
-    <div class="col-md-3 col-form-label form-control-label text-muted">Статус</div>
+    <div class="col-md-2 col-form-label form-control-label">Статус</div>
     <div class="col-md-3 col-form-label form-control-label">
         {% if document.status == 'ca' %}
             <div class="text-danger">
@@ -62,5 +79,5 @@
         </div>
 
 {% if document.status == 'va' %}
-    <p><a href={% url 'document_change_status' document.pk 'fi' %}>Подтвердить получение товара</a></p>
+    <button type="submit" class="btn btn-primary" onclick="location.href='{% url 'document_change_status' document.pk 'fi' %}'">Товар получен</button>
 {% endif %}

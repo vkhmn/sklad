@@ -2,15 +2,17 @@
 
 {% block content %}
     <h1>Подтвеждение заказа № {{ document_id }}</h1>
-    <p></p>
+    <p></p><br><br>
     {% if request.GET %}
        <form action="{% url 'document_confirm' %}" method="post">
             {% csrf_token %}
-            <input name="code" value="{{ request.GET.code }}"><p></p>
-            <button type="submit">Подтвердить получение</button>
-        </form>
+           <div class="form-group row">
+           <div class="col-lg-4">
+               <input name="code" value="{{ request.GET.code }}" class="form-control"}></div>
+            <button type="submit" class="btn btn-primary">Подтвердить получение</button>
+       </div>
+       </form>
     {% elif request.POST %}
         <p>Спасибо, что подтвердили заказ!'</p>
     {% endif %}
-
 {% endblock %}

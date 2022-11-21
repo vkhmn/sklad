@@ -4,8 +4,15 @@ import socket
 
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['127.0.0.1']
 BASE_URL = 'http://127.0.0.1:8000'
+
+NGROK_USE = True
+NGROK_URL = '8b68-164-138-92-119.ap.ngrok.io'
+if NGROK_USE:
+    CSRF_TRUSTED_ORIGINS = [f'https://{NGROK_URL}']
+    BASE_URL = f'https://{NGROK_URL}'
+    ALLOWED_HOSTS += [NGROK_URL]
 
 INSTALLED_APPS += [
     'debug_toolbar',

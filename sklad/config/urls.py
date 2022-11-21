@@ -12,6 +12,8 @@ urlpatterns = [
     path('', include('app.autocomplete.urls')),
 ]
 
+handler404 = 'app.core.views.page_not_found'
+
 if settings.DEBUG:
     import debug_toolbar
 

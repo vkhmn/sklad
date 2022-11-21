@@ -1,6 +1,6 @@
 from django.contrib.auth import logout
 from django.contrib.auth.views import LoginView
-from django.shortcuts import redirect
+from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
 
 from app.core.forms import LoginUserForm
@@ -28,3 +28,7 @@ def logout_user(request):
 
     logout(request)
     return redirect('login')
+
+
+def page_not_found(request, exception):
+    return render(request, 'core/404.html', status=404)

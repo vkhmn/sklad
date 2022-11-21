@@ -24,7 +24,7 @@ class NomenclatureListView(SuperUserRequiredMixin, ListView):
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update(
-            title='Номенклатура',
+            title='Номенклатура (все категории)',
             subcats=get_subcats(),
             search_form=SearchForm(data=self.request.GET),
             create_url='nomenclature_add',
