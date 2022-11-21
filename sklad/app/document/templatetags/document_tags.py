@@ -1,5 +1,4 @@
 from django import template
-from app.document.models import Status
 
 register = template.Library()
 
