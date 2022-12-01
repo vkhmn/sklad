@@ -1,5 +1,5 @@
+from datetime import timedelta
 from config.settings.base import *
-
 
 DEBUG = False
 ALLOWED_HOSTS = ['vkhmn.ru', '127.0.0.1']
