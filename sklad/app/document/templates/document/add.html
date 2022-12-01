@@ -56,8 +56,12 @@
         <div id="form_set">
             {{ document_nomenclature_form_set.management_form }}
             {% for form in document_nomenclature_form_set %}
-            <div class="text-danger">{{ form.non_field_errors }}</div>
             <table>
+                <tr>
+                    <td colspan="2">
+                        <div class="text-danger">{{ form.non_field_errors }}</div>
+                    </td>
+                </tr>
                 <tr>
                     <td width="170px" class="content-text">
 	                <label class="col-md-2 col-form-label form-control-label">
