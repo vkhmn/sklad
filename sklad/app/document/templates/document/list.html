@@ -32,11 +32,11 @@
                 {% if d.buyer %}
                     <td>Отгрузка</td>
                     <td><a href="{{ d.get_absolute_url }}">{{ d.number }}</a></td>
-                    <td>{{ d.buyer }}</td>
+                    <td><a href="{{ d.buyer.get_absolute_url }}">{{ d.buyer }}</a></td>
                 {% elif d.vendor %}
                     <td>Поставка</td>
                     <td><a href="{{ d.get_absolute_url }}">{{ d.number }}</a></td>
-                    <td>{{ d.vendor }}</td>
+                    <td><a href="{{ d.vendor.get_absolute_url }}">{{ d.vendor }}</a></td>
                 {% endif %}
                 <td><a href="{{ request.path }}?{% query_transform request status=d.status %}">
                     {{ d.get_status_display }}</a></td>

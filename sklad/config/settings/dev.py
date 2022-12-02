@@ -1,3 +1,4 @@
+from datetime import timedelta
 from config.settings.base import *
 import socket
 
@@ -7,7 +8,7 @@ DEBUG = True
 ALLOWED_HOSTS = ['127.0.0.1']
 BASE_URL = 'http://127.0.0.1:8000'
 
-NGROK_USE = True
+NGROK_USE = False
 NGROK_URL = '8b68-164-138-92-119.ap.ngrok.io'
 if NGROK_USE:
     CSRF_TRUSTED_ORIGINS = [f'https://{NGROK_URL}']
