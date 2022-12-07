@@ -17,15 +17,21 @@ services:
   db:
     env_file:
       - ./.env.prod
+    networks: # <-- here
+      - nginx_network
 
   celery:
     command: pipenv run celery -A config worker --concurrency=4
     env_file:
       - ./.env.prod
+    networks: # <-- here
+      - nginx_network
 
   celery_cron:
     env_file:
       - ./.env.prod
+    networks: # <-- here
+      - nginx_network
 
   nginx:
     build: ./nginx
