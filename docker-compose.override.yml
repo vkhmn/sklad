@@ -11,6 +11,8 @@ services:
 #      - ./sklad:/app
     env_file:
       - ./.env.prod
+    networks: # <-- here
+      - nginx_network
 
   db:
     env_file:
@@ -31,3 +33,9 @@ services:
       - 80:80
     depends_on:
       - app
+    networks: # <-- here
+      - nginx_network
+
+networks:  # <-- and here
+  nginx_network:
+    driver: bridge
