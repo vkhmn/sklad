@@ -4,7 +4,8 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-django-autocomplete-light = '*'
+django-autocomplete-light = "*"
+gunicorn = "*"
 django = "*"
 celery = "*"
 redis = "*"
