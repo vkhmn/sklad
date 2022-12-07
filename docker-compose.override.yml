@@ -7,8 +7,8 @@ services:
              pipenv run python3 manage.py migrate &&
              pipenv run python3 manage.py init_db &&
              pipenv run gunicorn config.wsgi:application --bind 0.0.0.0:8000"
-    volumes:
-      - ./sklad:/app
+#    volumes:
+#      - ./sklad:/app
     env_file:
       - ./.env.prod
 
