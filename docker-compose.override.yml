@@ -8,6 +8,8 @@ services:
              pipenv run python3 manage.py init_db &&
              pipenv run python3 manage.py collectstatic &&
              pipenv run gunicorn config.wsgi:application --bind 0.0.0.0:8000"
+    volumes:
+      - static_volume:/app/static
     env_file:
       - ./.env.prod
 
@@ -28,5 +30,11 @@ services:
     build: ./nginx
     ports:
       - 80:80
+    volumes:
+      - static_volume:/app/static
     depends_on:
       - app
+
+volumes:
+  postgres_data:
+  static_volume:
