@@ -4,8 +4,6 @@ services:
   app:
     build:
       context: .
-    ports:
-      - "8000:8000"
     depends_on:
       - db
 
@@ -24,7 +22,6 @@ services:
     depends_on:
       - db
       - redis
-      - app
 
   celery_cron:
     restart: always
@@ -36,4 +33,3 @@ services:
     depends_on:
       - db
       - redis
-      - app
