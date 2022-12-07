@@ -11,28 +11,19 @@ services:
 #      - ./sklad:/app
     env_file:
       - ./.env.prod
-    networks: # <-- here
-      - nginx_network
-      - db_network
 
   db:
     env_file:
       - ./.env.prod
-    networks: # <-- here
-      - db_network
 
   celery:
     command: pipenv run celery -A config worker --concurrency=4
     env_file:
       - ./.env.prod
-    networks: # <-- here
-      - db_network
 
   celery_cron:
     env_file:
       - ./.env.prod
-    networks: # <-- here
-      - db_network
 
   nginx:
     build: ./nginx
@@ -40,11 +31,3 @@ services:
       - 80:80
     depends_on:
       - app
-    networks: # <-- here
-      - nginx_network
-
-networks:  # <-- and here
-  nginx_network:
-    driver: bridge
-  db_network:
-    driver: bridge
